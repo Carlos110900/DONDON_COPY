@@ -1,0 +1,27 @@
+.comic-list {
+  width: min(100%, 1440px);
+  margin: 0 auto;
+  padding: clamp(1.25rem, 4vw, 3rem);
+}
+
+.page-title {
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  color: var(--text);
+}
+
+.comic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+.empty {
+  grid-column: 1 / -1;
+  padding: 4rem 1rem;
+  color: var(--muted);
+  text-align: center;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+}

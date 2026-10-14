@@ -1,0 +1,12 @@
+<section class="comic-list">
+  <h1 class="page-title">Mis favoritos</h1>
+  <div class="comic-grid">
+    @for (comic of comics(); track comic.id) {
+      <app-comic-card [comic]="comic" />
+    } @empty {
+      <p class="empty">
+        Aún no tienes cómics favoritos. Toca el corazón en cualquier cómic para guardarlo.
+      </p>
+    }
+  </div>
+</section>

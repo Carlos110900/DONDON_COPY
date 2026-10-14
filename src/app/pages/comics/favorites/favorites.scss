@@ -1,0 +1,22 @@
+.comic-list {
+  padding: 24px;
+}
+
+.page-title {
+  margin: 0 0 20px;
+  font-size: 1.6rem;
+  color: var(--text);
+}
+
+.comic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  padding: 48px 16px;
+  color: var(--muted);
+  text-align: center;
+}

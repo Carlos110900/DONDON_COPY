@@ -1,0 +1,17 @@
+<article class="card">
+  <a
+    [routerLink]="['/comics', comic().id]"
+    class="cover-link"
+    [attr.aria-label]="'Ver detalles de ' + comic().title"
+  >
+    <img class="cover" [src]="comic().cover" [alt]="'Portada de ' + comic().title" loading="lazy" />
+  </a>
+  <div class="body">
+    <h3 class="title">{{ comic().title }}</h3>
+    <p class="publisher">{{ comic().publisher }}</p>
+    <div class="actions">
+      <a class="btn-details" [routerLink]="['/comics', comic().id]">Ver detalles</a>
+      <app-heart [comicId]="comic().id" />
+    </div>
+  </div>
+</article>

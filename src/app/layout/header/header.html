@@ -1,0 +1,45 @@
+<nav class="navbar">
+  <a class="logo" routerLink="/">{{ appTitle() }}</a>
+
+  <form class="search-form" (submit)="$event.preventDefault()">
+    <div class="search-container">
+      <select
+        class="filter-select"
+        name="criterion"
+        aria-label="Criterio de búsqueda"
+        [ngModel]="search.criterion()"
+        (ngModelChange)="search.setCriterion($event)"
+      >
+        @for (criterion of search.criteria; track criterion.value) {
+          <option [value]="criterion.value">{{ criterion.label }}</option>
+        }
+      </select>
+
+      <div class="search-input-group">
+        <input
+          class="form-control"
+          type="search"
+          name="text"
+          placeholder="Buscar"
+          aria-label="Buscar"
+          [ngModel]="search.text()"
+          (ngModelChange)="search.setText($event)"
+        />
+        @if (search.text()) {
+          <button class="btn-clear" type="button" title="Limpiar búsqueda" (click)="search.clear()">
+            ✕
+          </button>
+        }
+      </div>
+    </div>
+  </form>
+
+  <ul class="nav-links">
+    <li>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+        >Cómics</a
+      >
+    </li>
+    <li><a routerLink="/favoritos" routerLinkActive="active">Favoritos</a></li>
+  </ul>
+</nav>

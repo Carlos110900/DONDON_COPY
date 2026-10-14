@@ -1,0 +1,10 @@
+<section class="comic-list">
+  <h1 class="page-title">Cómics</h1>
+  <div class="comic-grid">
+    @for (comic of comics(); track comic.id) {
+      <app-comic-card [comic]="comic" />
+    } @empty {
+      <p class="empty">No hay cómics que coincidan con la búsqueda.</p>
+    }
+  </div>
+</section>

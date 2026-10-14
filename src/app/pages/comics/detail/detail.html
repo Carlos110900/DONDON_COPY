@@ -1,0 +1,56 @@
+@if (comic(); as c) {
+  <section class="detail">
+    <div class="cover-column">
+      <img class="cover" [src]="c.cover" [alt]="'Portada de ' + c.title" />
+      <div class="actions">
+        <app-heart [comicId]="c.id" />
+        <a class="btn-back" routerLink="/">Volver a la lista</a>
+      </div>
+    </div>
+
+    <div class="info-column">
+      <h1 class="title">{{ c.title }}</h1>
+      <p class="description">{{ c.description }}</p>
+
+      <dl class="facts">
+        <dt>Editorial</dt>
+        <dd>{{ c.publisher }}</dd>
+
+        <dt>{{ c.writers.length > 1 ? 'Escritores' : 'Escritor' }}</dt>
+        <dd>
+          @for (person of c.writers; track person.name; let last = $last) {
+            {{ person.name }}{{ last ? '' : ', ' }}
+          }
+        </dd>
+
+        <dt>{{ c.artists.length > 1 ? 'Dibujantes' : 'Dibujante' }}</dt>
+        <dd>
+          @for (person of c.artists; track person.name; let last = $last) {
+            {{ person.name }}{{ last ? '' : ', ' }}
+          }
+        </dd>
+
+        <dt>{{ c.genres.length > 1 ? 'Géneros' : 'Género' }}</dt>
+        <dd>
+          @for (genre of c.genres; track genre; let last = $last) {
+            {{ genre }}{{ last ? '' : ', ' }}
+          }
+        </dd>
+      </dl>
+
+      <h2 class="chapters-title">Capítulos disponibles</h2>
+      <div class="chapters">
+        @for (chapter of c.chapters; track chapter.number) {
+          <app-chapter-item [comicId]="c.id" [chapter]="chapter" />
+        } @empty {
+          <p class="empty">Este cómic todavía no tiene capítulos.</p>
+        }
+      </div>
+    </div>
+  </section>
+} @else {
+  <div class="not-found">
+    <p>Cómic no encontrado.</p>
+    <a class="btn-back" routerLink="/">Volver a la lista</a>
+  </div>
+}

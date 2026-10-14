@@ -1,0 +1,82 @@
+.reader {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 72px);
+  height: calc(100dvh - 72px);
+  min-height: 460px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem clamp(1rem, 3vw, 2rem);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.current {
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+}
+
+.pager {
+  display: flex;
+  gap: 1rem;
+  min-width: 8rem;
+  justify-content: flex-end;
+}
+
+.link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.viewer {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 0;
+  background: #0b0d11;
+}
+
+.not-found {
+  padding: 6rem 1rem;
+  text-align: center;
+  color: var(--text);
+}
+
+@media (max-width: 560px) {
+  .reader {
+    height: calc(100vh - 120px);
+    height: calc(100dvh - 120px);
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+
+  .current {
+    order: 3;
+    flex-basis: 100%;
+    text-align: left;
+  }
+
+  .pager {
+    min-width: 0;
+    gap: 0.75rem;
+  }
+
+  .viewer {
+    min-height: 70vh;
+  }
+}

@@ -1,14 +1,15 @@
 {
   "name": "don-do-dontonbori",
   "version": "0.0.0",
+  "Author": "Diego Orozco, Gonzalo Celis",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:DonDoDontonbori": "node dist/DonDoDontonbori/server/server.mjs",
     "test:coverage": "ng test --coverage",
+    "serve:ssr:DonDoDontonbori": "node dist/DonDoDontonbori/server/server.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -30,15 +31,15 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular-eslint/schematics": "^22.5.0",
+    "@angular-eslint/schematics": "^21.0.0",
     "@angular/build": "^21.2.26",
     "@angular/cli": "^21.2.26",
     "@angular/compiler-cli": "^21.2.0",
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.0.0",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
-    "angular-eslint": "^22.5.0",
-    "eslint": "^10.12.0",
+    "angular-eslint": "^21.0.0",
+    "eslint": "^9.0.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.13.0",
     "husky": "^9.1.7",
@@ -51,14 +52,7 @@
     "vitest": "^4.0.8"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,css,md}": [
-      "prettier --write"
-    ],
-    "*.{ts,html}": [
+    "*.{ts,js,html}": [
       "eslint --fix",
       "prettier --write"
     ],
