@@ -25,11 +25,11 @@
           [ngModel]="search.text()"
           (ngModelChange)="search.setText($event)"
         />
-        @if (search.text()) {
+        <!-- @if (search.text()) {
           <button class="btn-clear" type="button" title="Limpiar búsqueda" (click)="search.clear()">
             ✕
           </button>
-        }
+        } -->
       </div>
     </div>
   </form>
