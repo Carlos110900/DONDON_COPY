@@ -1,0 +1,19 @@
+<section class="auth">
+  <div class="card form-card">
+    <h1>Iniciar sesión</h1>
+    <p class="muted">Entra con Google para guardar favoritos y tu progreso.</p>
+
+    <label class="field">
+      Entrar como (solo demo)
+      <select name="role" [(ngModel)]="role">
+        <option value="reader">Lector registrado</option>
+        <option value="publisher">Publicador</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </label>
+
+    <button type="button" class="btn btn-primary" (click)="enter()">Continuar con Google</button>
+
+    <p class="muted">¿Primera vez? <a routerLink="/registro">Crea tu cuenta</a></p>
+  </div>
+</section>

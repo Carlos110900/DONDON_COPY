@@ -1,0 +1,23 @@
+<section class="auth">
+  <form class="card form-card" #form="ngForm" (ngSubmit)="submit(form)" novalidate>
+    <h1>Crear cuenta</h1>
+    <p class="muted">Tu cuenta se crea con Google. Solo elige cómo quieres que te veamos.</p>
+
+    <label class="field">
+      Nombre visible
+      <input name="displayName" [(ngModel)]="displayName" #name="ngModel" required minlength="3" />
+      @if (name.invalid && name.touched) {
+        <small class="error">Escribe al menos 3 caracteres.</small>
+      }
+    </label>
+
+    <label class="check">
+      <input type="checkbox" name="accepted" [(ngModel)]="accepted" required />
+      Acepto los términos de uso
+    </label>
+
+    <button type="submit" class="btn btn-primary">Registrarme con Google</button>
+
+    <p class="muted">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+  </form>
+</section>
