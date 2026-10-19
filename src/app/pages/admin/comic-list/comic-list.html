@@ -1,0 +1,36 @@
+<section class="page">
+  <div class="page-header">
+    <h1>Mis cómics</h1>
+    <a class="btn btn-primary" routerLink="/panel/comics/nuevo">Nuevo cómic</a>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Editorial</th>
+          <th>Capítulos</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.id) {
+          <tr>
+            <td>{{ row.title }}</td>
+            <td>{{ row.publisher }}</td>
+            <td>{{ row.chapters }}</td>
+            <td>
+              <span class="badge">{{ row.status }}</span>
+            </td>
+            <td class="row">
+              <a class="btn" [routerLink]="['/comics', row.id]">Ver</a>
+              <button type="button" class="btn btn-danger" (click)="remove(row)">Eliminar</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

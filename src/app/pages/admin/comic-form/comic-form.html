@@ -1,0 +1,60 @@
+<section class="page">
+  <form class="card form-card wide" #form="ngForm" (ngSubmit)="submit(form)" novalidate>
+    <h1>Nuevo cómic</h1>
+
+    <label class="field">
+      Título
+      <input name="title" [(ngModel)]="model.title" #title="ngModel" required />
+      @if (title.invalid && title.touched) {
+        <small class="error">El título es obligatorio.</small>
+      }
+    </label>
+
+    <label class="field">
+      Autor
+      <input name="author" [(ngModel)]="model.author" />
+    </label>
+
+    <label class="field">
+      Sinopsis
+      <textarea
+        name="synopsis"
+        rows="4"
+        [(ngModel)]="model.synopsis"
+        #synopsis="ngModel"
+        required
+        minlength="20"
+      ></textarea>
+      @if (synopsis.invalid && synopsis.touched) {
+        <small class="error">Escribe al menos 20 caracteres.</small>
+      }
+    </label>
+
+    <label class="field">
+      Estado
+      <select name="status" [(ngModel)]="model.status">
+        <option value="ongoing">En curso</option>
+        <option value="completed">Finalizado</option>
+      </select>
+    </label>
+
+    <fieldset class="field">
+      <legend>Tags</legend>
+      @for (tag of tags; track tag) {
+        <label class="check"
+          ><input type="checkbox" [name]="'tag-' + tag" ngModel /> {{ tag }}</label
+        >
+      }
+    </fieldset>
+
+    <label class="field">
+      Portada
+      <input type="file" name="cover" accept="image/*" />
+    </label>
+
+    <div class="row">
+      <button type="submit" class="btn btn-primary">Guardar</button>
+      <a class="btn" routerLink="/panel/comics">Cancelar</a>
+    </div>
+  </form>
+</section>
