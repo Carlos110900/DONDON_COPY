@@ -1,0 +1,18 @@
+<section class="hero">
+  <h1>Lee, guarda y sigue tus cómics favoritos</h1>
+  <p>DonDoDontonbori es una plataforma web para leer mangas, cómics y novelas gráficas.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" routerLink="/catalogo">Explorar catálogo</a>
+    <a class="btn" routerLink="/registro">Crear cuenta</a>
+  </div>
+</section>
+
+<section class="page features">
+  @for (f of features; track f.title) {
+    <article class="card">
+      <span class="icon">{{ f.icon }}</span>
+      <h3>{{ f.title }}</h3>
+      <p class="muted">{{ f.text }}</p>
+    </article>
+  }
+</section>
