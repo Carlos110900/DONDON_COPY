@@ -29,9 +29,20 @@ export class ComicList {
       chapters: 1,
       status: 'En curso',
     },
-    { id: 'dandadan', title: 'Dandadan', publisher: 'Shueisha', chapters: 24, status: 'En curso' },
-    { id: 'akira', title: 'Akira', publisher: 'Kodansha', chapters: 120, status: 'Finalizado' },
-    { id: 'maus', title: 'Maus', publisher: 'Pantheon', chapters: 6, status: 'Finalizado' },
+    {
+      id: 'initial-d',
+      title: 'Initial D',
+      publisher: 'Kodansha',
+      chapters: 24,
+      status: 'En curso',
+    },
+    {
+      id: 'ben-10-dynamite',
+      title: 'Ben 10: Dynamite',
+      publisher: 'Cartoon Network',
+      chapters: 4,
+      status: 'Finalizado',
+    },
   ];
 
   async remove(row: ComicRow): Promise<void> {
