@@ -1,0 +1,25 @@
+@if (confirm.message(); as text) {
+  <div
+    class="backdrop"
+    role="button"
+    tabindex="0"
+    aria-label="Cerrar confirmación"
+    (click)="confirm.answer(false)"
+    (keydown.enter)="confirm.answer(false)"
+    (keydown.space)="confirm.answer(false); $event.preventDefault()"
+  >
+    <div
+      class="dialog"
+      role="dialog"
+      aria-modal="true"
+      (click)="$event.stopPropagation()"
+      (keydown)="$event.stopPropagation()"
+    >
+      <p>{{ text }}</p>
+      <div class="dialog-actions">
+        <button type="button" class="btn" (click)="confirm.answer(false)">No</button>
+        <button type="button" class="btn btn-danger" (click)="confirm.answer(true)">Sí</button>
+      </div>
+    </div>
+  </div>
+}
