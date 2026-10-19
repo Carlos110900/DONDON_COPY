@@ -36,10 +36,18 @@
 
   <ul class="nav-links">
     <li>
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-        >Cómics</a
-      >
+      <a routerLink="/catalogo" routerLinkActive="active">Catálogo</a>
     </li>
-    <li><a routerLink="/favoritos" routerLinkActive="active">Favoritos</a></li>
+    <li>
+      <a routerLink="/favoritos" routerLinkActive="active">Favoritos</a>
+    </li>
+    <li *appHasRole="['publisher', 'admin']">
+      <a routerLink="/panel" routerLinkActive="active">Panel</a>
+    </li>
+    @if (session.isLoggedIn()) {
+      <li><button type="button" class="btn" (click)="logout()">Salir</button></li>
+    } @else {
+      <li><a class="btn btn-primary" routerLink="/login">Iniciar sesión</a></li>
+    }
   </ul>
 </nav>
