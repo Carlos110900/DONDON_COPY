@@ -4,33 +4,66 @@
     <a class="btn btn-primary" routerLink="/panel/comics/nuevo">Nuevo cómic</a>
   </div>
 
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Título</th>
-          <th>Editorial</th>
-          <th>Capítulos</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of rows; track row.id) {
+  @if (store.isLoading()) {
+    <app-data-state kind="loading" message="Cargando cómics…" />
+  } @else if (store.status() === 'error') {
+    <app-data-state
+      kind="error"
+      [message]="store.error()?.message ?? ''"
+      [retryable]="true"
+      (retry)="store.load(true)"
+    />
+  } @else if (view().total === 0) {
+    <app-data-state
+      kind="empty"
+      [message]="
+        store.comics().length === 0
+          ? 'Aún no hay cómics. Crea el primero.'
+          : 'Ningún cómic coincide con la búsqueda.'
+      "
+    />
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
           <tr>
-            <td>{{ row.title }}</td>
-            <td>{{ row.publisher }}</td>
-            <td>{{ row.chapters }}</td>
-            <td>
-              <span class="badge">{{ row.status }}</span>
-            </td>
-            <td class="row">
-              <a class="btn" [routerLink]="['/comics', row.id]">Ver</a>
-              <button type="button" class="btn btn-danger" (click)="remove(row)">Eliminar</button>
-            </td>
+            <th>Título</th>
+            <th>Editorial</th>
+            <th>Capítulos</th>
+            <th>Estado</th>
+            <th>Acciones</th>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          @for (comic of view().items; track comic.id) {
+            <tr>
+              <td>{{ comic.title }}</td>
+              <td>{{ comic.publisher }}</td>
+              <td>{{ comic.chapters.length }}</td>
+              <td>
+                <span class="badge">{{ comic.statusLabel }}</span>
+              </td>
+              <td class="row">
+                <a class="btn" [routerLink]="['/comics', comic.id]">Ver</a>
+                <a class="btn" [routerLink]="['/panel/comics', comic.id, 'editar']">Editar</a>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  [disabled]="deletingId() === comic.id"
+                  (click)="remove(comic)"
+                >
+                  {{ deletingId() === comic.id ? 'Eliminando…' : 'Eliminar' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination
+      [page]="view().page"
+      [totalPages]="view().totalPages"
+      (pageChange)="page.set($event)"
+    />
+  }
 </section>

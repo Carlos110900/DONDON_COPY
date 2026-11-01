@@ -10,6 +10,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Landing } from './pages/landing/landing';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
+import { pendingChangesGuard } from './shared/guards/pending-changes-guard';
 import { permissionGuard } from './shared/guards/permission-guard';
 
 export const routes: Routes = [
@@ -35,7 +36,18 @@ export const routes: Routes = [
     children: [
       { path: '', component: Dashboard, title: 'Panel' },
       { path: 'comics', component: ComicList, title: 'Mis cómics' },
-      { path: 'comics/nuevo', component: ComicForm, title: 'Nuevo cómic' },
+      {
+        path: 'comics/nuevo',
+        component: ComicForm,
+        title: 'Nuevo cómic',
+        canDeactivate: [pendingChangesGuard],
+      },
+      {
+        path: 'comics/:id/editar',
+        component: ComicForm,
+        title: 'Editar cómic',
+        canDeactivate: [pendingChangesGuard],
+      },
       {
         path: 'usuarios',
         component: UserList,
