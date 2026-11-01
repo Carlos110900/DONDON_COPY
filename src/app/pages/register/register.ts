@@ -1,31 +1,51 @@
-import { Component, inject } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { FormField } from '../../shared/components/form-field/form-field';
 import { Session } from '../../shared/services/session';
 import { Toast } from '../../shared/services/toast/toast';
+import { notBlank, sameAs } from '../../shared/validators/form-validators';
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, FormField],
   templateUrl: './register.html',
   styleUrl: './register.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Register {
+  private readonly fb = inject(NonNullableFormBuilder);
   private readonly session = inject(Session);
   private readonly router = inject(Router);
   private readonly toast = inject(Toast);
 
-  displayName = '';
-  accepted = false;
+  protected readonly submitting = signal(false);
 
-  submit(form: NgForm): void {
-    if (form.invalid) {
-      form.control.markAllAsTouched();
+  readonly form = this.fb.group({
+    name: ['', [Validators.required, notBlank]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    confirm: ['', [Validators.required, sameAs('password')]],
+    accepted: [false, [Validators.requiredTrue]],
+  });
+
+  constructor() {
+    this.form.controls.password.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.form.controls.confirm.updateValueAndValidity());
+  }
+
+  submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       this.toast.show('Revisa los campos marcados.', 'error');
       return;
     }
-    this.session.login('reader', this.displayName);
+    this.submitting.set(true);
+    // ⚠️🐍Después cambiar con la connexion a la base de datos, bueno al servicio que lo conecta, porque exponer al front es malo🐍⚠️
+    this.session.login('reader', this.form.controls.name.value);
     this.toast.show('Cuenta creada correctamente.');
-    this.router.navigate(['/catalogo']);
+    this.router.navigate(['/catalogo']).finally(() => this.submitting.set(false));
   }
 }
