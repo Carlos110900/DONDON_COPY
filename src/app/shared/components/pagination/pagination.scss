@@ -1,0 +1,14 @@
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 2rem;
+}
+
+.current {
+  color: #111318;
+  font-weight: 600;
+  background: var(--accent);
+  border-color: var(--accent);
+}

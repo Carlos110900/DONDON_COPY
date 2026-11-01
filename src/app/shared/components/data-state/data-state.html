@@ -1,0 +1,22 @@
+<div
+  class="state"
+  [class.state-error]="kind() === 'error'"
+  [attr.role]="kind() === 'error' ? 'alert' : 'status'"
+>
+  @switch (kind()) {
+    @case ('loading') {
+      <span class="spinner" aria-hidden="true"></span>
+      <p>{{ message() || 'Cargando…' }}</p>
+    }
+    @case ('error') {
+      <p>{{ message() || 'Ocurrió un error.' }}</p>
+      @if (retryable()) {
+        <button type="button" class="btn" (click)="retry.emit()">Reintentar</button>
+      }
+    }
+    @case ('empty') {
+      <p>{{ message() }}</p>
+    }
+  }
+  <ng-content />
+</div>
