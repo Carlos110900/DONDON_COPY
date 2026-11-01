@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Comic } from '../../models/comic';
 import { Heart } from '../heart/heart';
@@ -11,4 +11,5 @@ import { Heart } from '../heart/heart';
 })
 export class ComicCard {
   readonly comic = input.required<Comic>();
+  protected readonly coverState = signal<'loading' | 'loaded' | 'error'>('loading');
 }
