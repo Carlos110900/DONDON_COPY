@@ -1,60 +1,106 @@
 <section class="page">
-  <form class="card form-card wide" #form="ngForm" (ngSubmit)="submit(form)" novalidate>
-    <h1>Nuevo cómic</h1>
+  @if (loading()) {
+    <app-data-state kind="loading" message="Cargando cómic…" />
+  } @else if (loadError(); as err) {
+    <app-data-state
+      kind="error"
+      [message]="err.isNotFound ? 'Ese cómic no existe.' : err.message"
+      [retryable]="!err.isNotFound"
+      (retry)="reload()"
+    >
+      <a class="btn" routerLink="/panel/comics">Volver a mis cómics</a>
+    </app-data-state>
+  } @else {
+    <form class="card form-card wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <h1>{{ isEdit ? 'Editar cómic' : 'Nuevo cómic' }}</h1>
 
-    <label class="field">
-      Título
-      <input name="title" [(ngModel)]="model.title" #title="ngModel" required />
-      @if (title.invalid && title.touched) {
-        <small class="error">El título es obligatorio.</small>
+      @if (submitError(); as msg) {
+        <p class="alert" role="alert">No se pudo guardar: {{ msg }}</p>
       }
-    </label>
 
-    <label class="field">
-      Autor
-      <input name="author" [(ngModel)]="model.author" />
-    </label>
+      <label class="field">
+        Título
+        <input formControlName="title" autocomplete="off" />
+        @if (errorMessage('title'); as msg) {
+          <small class="error">{{ msg }}</small>
+        } @else if (form.controls.title.pending) {
+          <small class="muted">Verificando disponibilidad…</small>
+        } @else if (!isEdit) {
+          <small class="muted">Identificador: {{ slugPreview() }}</small>
+        }
+      </label>
 
-    <label class="field">
-      Sinopsis
-      <textarea
-        name="synopsis"
-        rows="4"
-        [(ngModel)]="model.synopsis"
-        #synopsis="ngModel"
-        required
-        minlength="20"
-      ></textarea>
-      @if (synopsis.invalid && synopsis.touched) {
-        <small class="error">Escribe al menos 20 caracteres.</small>
-      }
-    </label>
+      <label class="field">
+        Sinopsis
+        <textarea formControlName="description" rows="4"></textarea>
+        @if (errorMessage('description'); as msg) {
+          <small class="error">{{ msg }}</small>
+        }
+      </label>
 
-    <label class="field">
-      Estado
-      <select name="status" [(ngModel)]="model.status">
-        <option value="ongoing">En curso</option>
-        <option value="completed">Finalizado</option>
-      </select>
-    </label>
+      <label class="field">
+        Editorial
+        <input formControlName="publisher" />
+        @if (errorMessage('publisher'); as msg) {
+          <small class="error">{{ msg }}</small>
+        }
+      </label>
 
-    <fieldset class="field">
-      <legend>Tags</legend>
-      @for (tag of tags; track tag) {
-        <label class="check"
-          ><input type="checkbox" [name]="'tag-' + tag" ngModel /> {{ tag }}</label
-        >
-      }
-    </fieldset>
+      <label class="field">
+        Escritores
+        <input formControlName="writers" placeholder="Ej. Scott Snyder, Otro Autor" />
+        @if (errorMessage('writers'); as msg) {
+          <small class="error">{{ msg }}</small>
+        }
+      </label>
 
-    <label class="field">
-      Portada
-      <input type="file" name="cover" accept="image/*" />
-    </label>
+      <label class="field">
+        Dibujantes
+        <input formControlName="artists" placeholder="Ej. Nick Dragotta" />
+        @if (errorMessage('artists'); as msg) {
+          <small class="error">{{ msg }}</small>
+        }
+      </label>
 
-    <div class="row">
-      <button type="submit" class="btn btn-primary">Guardar</button>
-      <a class="btn" routerLink="/panel/comics">Cancelar</a>
-    </div>
-  </form>
+      <label class="field">
+        Estado
+        <select formControlName="status">
+          <option value="ongoing">En curso</option>
+          <option value="completed">Finalizado</option>
+        </select>
+      </label>
+
+      <fieldset class="field">
+        <legend>Géneros</legend>
+        @for (genre of genreOptions; track genre) {
+          <label class="check">
+            <input
+              type="checkbox"
+              [checked]="isGenreChecked(genre)"
+              (change)="toggleGenre(genre, $event)"
+            />
+            {{ genre }}
+          </label>
+        }
+        @if (errorMessage('genres'); as msg) {
+          <small class="error">{{ msg }}</small>
+        }
+      </fieldset>
+
+      <label class="field">
+        Portada (ruta en public)
+        <input formControlName="cover" placeholder="/comics/mi-comic/cover/mi-comic.jpg" />
+        @if (errorMessage('cover'); as msg) {
+          <small class="error">{{ msg }}</small>
+        }
+      </label>
+
+      <div class="row">
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Guardando…' : 'Guardar' }}
+        </button>
+        <a class="btn" routerLink="/panel/comics">Cancelar</a>
+      </div>
+    </form>
+  }
 </section>
