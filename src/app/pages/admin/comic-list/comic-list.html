@@ -25,6 +25,7 @@
               <span class="badge">{{ row.status }}</span>
             </td>
             <td class="row">
+              <a class="btn" [routerLink]="['/panel/comics', row.id, 'editar']">Editar</a>
               <a class="btn" [routerLink]="['/comics', row.id]">Ver</a>
               <button type="button" class="btn btn-danger" (click)="remove(row)">Eliminar</button>
             </td>
