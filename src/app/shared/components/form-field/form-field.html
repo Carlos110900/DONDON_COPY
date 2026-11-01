@@ -1,0 +1,9 @@
+<div class="field">
+  @if (label()) {
+    <label [attr.for]="inputId() || null">{{ label() }}</label>
+  }
+  <ng-content />
+  @if (error(); as text) {
+    <small class="error" role="alert">{{ text }}</small>
+  }
+</div>
