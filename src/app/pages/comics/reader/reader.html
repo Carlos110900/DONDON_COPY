@@ -1,4 +1,15 @@
-@if (comic(); as c) {
+@if (loading()) {
+  <app-data-state kind="loading" message="Cargando capítulo…" />
+} @else if (error(); as err) {
+  <app-data-state
+    kind="error"
+    [message]="err.isNotFound ? 'Cómic no encontrado.' : err.message"
+    [retryable]="!err.isNotFound"
+    (retry)="reload()"
+  >
+    <a class="link" routerLink="/catalogo">Volver a la lista</a>
+  </app-data-state>
+} @else if (comic(); as c) {
   @if (chapter(); as ch) {
     <section class="reader">
       <header class="toolbar">
@@ -17,14 +28,8 @@
       <app-pdf-viewer class="viewer" [url]="ch.pdfUrl" [title]="c.title + ' - ' + ch.label" />
     </section>
   } @else {
-    <div class="not-found">
-      <p>Capítulo no encontrado.</p>
+    <app-data-state kind="empty" message="Capítulo no encontrado.">
       <a class="link" [routerLink]="['/comics', c.id]">Volver al cómic</a>
-    </div>
+    </app-data-state>
   }
-} @else {
-  <div class="not-found">
-    <p>Cómic no encontrado.</p>
-    <a class="link" routerLink="/">Volver a la lista</a>
-  </div>
 }
