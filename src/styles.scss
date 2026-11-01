@@ -37,7 +37,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -70,7 +71,6 @@ h3 {
     transition-duration: 0.01ms !important;
   }
 }
-////////
 
 /* ===== Utilidades compartidas por las pantallas nuevas ===== */
 .page {
@@ -204,4 +204,31 @@ h3 {
   color: var(--accent);
   border: 1px solid var(--accent);
   border-radius: 999px;
+}
+
+/* ===== Entrega 3: formularios y estados ===== */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  border-color: var(--border);
+}
+
+.alert {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  color: var(--danger);
+  background: rgb(255 101 119 / 10%);
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+}
+
+.field {
+  textarea {
+    resize: vertical;
+  }
+
+  input.ng-invalid.ng-touched,
+  textarea.ng-invalid.ng-touched {
+    border-color: var(--danger);
+  }
 }
