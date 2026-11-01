@@ -1,0 +1,179 @@
+{
+  "comics": [
+    {
+      "id": "absolute-batman",
+      "title": "Absolute Batman",
+      "description": "Una versión distinta de Gotham y de Bruce Wayne, sin fortuna ni mayordomo, con una fuerza fuera de lo común.",
+      "cover": "/comics/absolute-batman/cover/absolute-batman.jpg",
+      "publisher": "DC Comics",
+      "status": "ongoing",
+      "genres": ["Superhéroes", "Acción", "Crimen"],
+      "involved": [
+        { "name": "Scott Snyder", "role": "writer" },
+        { "name": "Nick Dragotta", "role": "artist" }
+      ],
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Absolute Batman #1",
+          "pdfUrl": "/comics/absolute-batman/capitulos/Absolute_Batman_1.pdf"
+        },
+        {
+          "number": 2,
+          "title": "Absolute Batman #2",
+          "pdfUrl": "/comics/absolute-batman/capitulos/Absolute_Batman_2.pdf"
+        },
+        {
+          "number": 3,
+          "title": "Absolute Batman #3",
+          "pdfUrl": "/comics/absolute-batman/capitulos/Absolute_Batman_3.pdf"
+        },
+        {
+          "number": 4,
+          "title": "Absolute Batman #4",
+          "pdfUrl": "/comics/absolute-batman/capitulos/Absolute_Batman_4.pdf"
+        }
+      ]
+    },
+    {
+      "id": "initial-d",
+      "title": "Initial D",
+      "description": "Takumi Fujiwara es un joven repartidor de tofu que se ve envuelto en el mundo de las carreras callejeras en las montañas de Gunma, Japón.",
+      "cover": "/comics/initial-d/cover/initial-d.jpg",
+      "publisher": "Kodansha",
+      "status": "ongoing",
+      "genres": ["Deportes", "Acción", "Drama"],
+      "involved": [
+        { "name": "Shuichi Shigeno", "role": "writer" },
+        { "name": "Shuichi Shigeno", "role": "artist" }
+      ],
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Initial D #1",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_1.pdf"
+        },
+        {
+          "number": 2,
+          "title": "Initial D #2",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_2.pdf"
+        },
+        {
+          "number": 3,
+          "title": "Initial D #3",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_3.pdf"
+        },
+        {
+          "number": 4,
+          "title": "Initial D #4",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_4.pdf"
+        },
+        {
+          "number": 5,
+          "title": "Initial D #5",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_5.pdf"
+        },
+        {
+          "number": 6,
+          "title": "Initial D #6",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_6.pdf"
+        },
+        {
+          "number": 7,
+          "title": "Initial D #7",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_7.pdf"
+        },
+        {
+          "number": 8,
+          "title": "Initial D #8",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_8.pdf"
+        },
+        {
+          "number": 9,
+          "title": "Initial D #9",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_9.pdf"
+        },
+        {
+          "number": 10,
+          "title": "Initial D #10",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_10.pdf"
+        },
+        {
+          "number": 11,
+          "title": "Initial D #11",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_11.pdf"
+        },
+        {
+          "number": 12,
+          "title": "Initial D #12",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_12.pdf"
+        },
+        {
+          "number": 13,
+          "title": "Initial D #13",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_13.pdf"
+        },
+        {
+          "number": 14,
+          "title": "Initial D #14",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_14.pdf"
+        },
+        {
+          "number": 15,
+          "title": "Initial D #15",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_15.pdf"
+        },
+        {
+          "number": 16,
+          "title": "Initial D #16",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_16.pdf"
+        },
+        {
+          "number": 17,
+          "title": "Initial D #17",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_17.pdf"
+        },
+        {
+          "number": 18,
+          "title": "Initial D #18",
+          "pdfUrl": "/comics/initial-d/capitulos/Initial_D_18.pdf"
+        }
+      ]
+    },
+    {
+      "id": "ben-10-dynamite",
+      "title": "Ben 10: Dynamite",
+      "description": "Ben Tennyson, un joven de 10 años, descubre un dispositivo alienígena llamado Omnitrix que le permite transformarse en diferentes especies alienígenas y luchar contra el mal.",
+      "cover": "/comics/ben-10-dynamite/cover/ben-10-dynamite.jpg",
+      "publisher": "Cartoon Network",
+      "status": "completed",
+      "genres": ["Aventura", "Ciencia ficción", "Acción"],
+      "involved": [
+        { "name": "Dwayne McDuffie", "role": "writer" },
+        { "name": "Manuel Gutierrez", "role": "artist" }
+      ],
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Ben 10: Dynamite #1",
+          "pdfUrl": "/comics/ben-10-dynamite/capitulos/Ben_10_Dynamite_1.pdf"
+        },
+        {
+          "number": 2,
+          "title": "Ben 10: Dynamite #2",
+          "pdfUrl": "/comics/ben-10-dynamite/capitulos/Ben_10_Dynamite_2.pdf"
+        },
+        {
+          "number": 3,
+          "title": "Ben 10: Dynamite #3",
+          "pdfUrl": "/comics/ben-10-dynamite/capitulos/Ben_10_Dynamite_3.pdf"
+        },
+        {
+          "number": 4,
+          "title": "Ben 10: Dynamite #4",
+          "pdfUrl": "/comics/ben-10-dynamite/capitulos/Ben_10_Dynamite_4.pdf"
+        }
+      ]
+    }
+  ]
+}
