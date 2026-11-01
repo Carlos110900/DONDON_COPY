@@ -1,5 +1,8 @@
 import { Chapter } from './chapter';
+import { COMIC_STATUSES, ComicStatus } from './comic-status';
 import { Involved } from './involved/involved';
+
+export const DEFAULT_COVER = '/recursos/portada-default.jpg';
 
 export class Comic {
   constructor(
@@ -11,7 +14,12 @@ export class Comic {
     public readonly genres: readonly string[],
     public readonly involved: readonly Involved[],
     public readonly chapters: readonly Chapter[],
+    public readonly status: ComicStatus = 'ongoing',
   ) {}
+
+  get statusLabel(): string {
+    return COMIC_STATUSES.find((s) => s.value === this.status)?.label ?? '';
+  }
 
   get writers(): Involved[] {
     return this.involved.filter((person) => person.isWriter);
