@@ -36,6 +36,11 @@ export class FormField {
     { initialValue: null },
   );
 
+  protected readonly pending = computed(() => {
+    this.changes();
+    return this.control().pending;
+  });
+
   protected readonly error = computed(() => {
     this.changes(); // Revisa cuando el control cambia
     const control = this.control();
@@ -48,10 +53,5 @@ export class FormField {
       MENSAJES_DEFAULT[key]?.((detail ?? {}) as ValidationErrors) ??
       'El valor no es válido.'
     );
-  });
-
-  protected readonly pending = computed(() => {
-    this.changes();
-    return this.control().pending;
   });
 }

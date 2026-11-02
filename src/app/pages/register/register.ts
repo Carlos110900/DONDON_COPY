@@ -19,7 +19,6 @@ export class Register {
   private readonly session = inject(Session);
   private readonly router = inject(Router);
   private readonly toast = inject(Toast);
-
   protected readonly submitting = signal(false);
 
   readonly form = this.fb.group({
@@ -31,7 +30,6 @@ export class Register {
   });
 
   constructor() {
-    // Si cambia la contraseña, vuelve a validar la confirmación
     this.form.controls.password.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.form.controls.confirm.updateValueAndValidity());
@@ -43,8 +41,8 @@ export class Register {
       this.toast.show('Revisa los campos marcados.', 'error');
       return;
     }
+
     this.submitting.set(true);
-    // Pendiente: enviar a la API (/users) cuando haya autenticación real
     this.session.login('reader', this.form.controls.name.value);
     this.toast.show('Cuenta creada correctamente.');
     this.router.navigate(['/catalogo']).finally(() => this.submitting.set(false));

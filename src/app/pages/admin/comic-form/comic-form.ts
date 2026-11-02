@@ -15,7 +15,6 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { of } from 'rxjs';
-
 import { ComicInput } from '../../../shared/api/comic.dto';
 import { DataState } from '../../../shared/components/data-state/data-state';
 import { FormField } from '../../../shared/components/form-field/form-field';
@@ -24,6 +23,7 @@ import { Comic, DEFAULT_COVER } from '../../../shared/models/comic';
 import { COMIC_STATUSES, ComicStatus } from '../../../shared/models/comic-status';
 import { ComicRepository } from '../../../shared/repositories/comic-repository';
 import { ComicStore } from '../../../shared/services/comic-store';
+import { TagServices } from '../../../shared/services/tag-services';
 import { Toast } from '../../../shared/services/toast/toast';
 import { compressImage } from '../../../shared/utils/image';
 import { loadResource } from '../../../shared/utils/load-resource';
@@ -54,30 +54,15 @@ export class ComicForm implements PendingChanges {
   private readonly store = inject(ComicStore);
   private readonly toast = inject(Toast);
   private readonly destroyRef = inject(DestroyRef);
-
-  /** null = alta; con valor = edición. */
-  private readonly editingId = this.route.snapshot.paramMap.get('id');
-  protected readonly isEdit = this.editingId !== null;
-
+  protected readonly tags = inject(TagServices).tags;
   protected readonly statuses = COMIC_STATUSES;
-  protected readonly genreOptions = [
-    'Acción',
-    'Aventura',
-    'Ciencia ficción',
-    'Comedia',
-    'Crimen',
-    'Deportes',
-    'Drama',
-    'Fantasía',
-    'Misterio',
-    'Superhéroes',
-    'Terror',
-  ];
-
   protected readonly submitting = signal(false);
   protected readonly submitError = signal<string | null>(null);
   protected readonly cover = signal(DEFAULT_COVER);
 
+  /** null = alta; con valor = edición. */
+  private readonly editingId = this.route.snapshot.paramMap.get('id');
+  protected readonly isEdit = this.editingId !== null;
   private savedCover = DEFAULT_COVER;
   private objectUrl: string | null = null;
 
@@ -100,7 +85,6 @@ export class ComicForm implements PendingChanges {
     cover: new FormControl<File | null>(null, coverFile),
   });
 
-  // En edición se carga el cómic desde la API; en alta no hay nada que cargar.
   private readonly resource = this.editingId
     ? loadResource(of(this.editingId), (id) => this.repository.getById(id))
     : null;
@@ -114,7 +98,6 @@ export class ComicForm implements PendingChanges {
       this.form.controls.title.addAsyncValidators(uniqueComicId(this.repository));
     }
 
-    // Edición precargada: reset() rellena el formulario y lo deja pristine
     effect(() => {
       const comic = this.resource?.data();
       if (!comic) return;
@@ -140,10 +123,12 @@ export class ComicForm implements PendingChanges {
     return this.form.controls.genres.value.includes(name);
   }
 
-  protected toggleGenre(name: string): void {
+  protected toggleTag(name: string): void {
     const control = this.form.controls.genres;
     control.setValue(
-      this.isSelected(name) ? control.value.filter((g) => g !== name) : [...control.value, name],
+      this.isSelected(name)
+        ? control.value.filter((tag) => tag !== name)
+        : [...control.value, name],
     );
     control.markAsDirty();
     control.markAsTouched();
@@ -165,7 +150,6 @@ export class ComicForm implements PendingChanges {
     }
   }
 
-  // usar imagen por defecto si algo sale mal
   protected onCoverError(): void {
     if (this.cover() !== DEFAULT_COVER) {
       this.cover.set(DEFAULT_COVER);
@@ -191,7 +175,8 @@ export class ComicForm implements PendingChanges {
       } else {
         await this.store.create(slugify(input.title), input);
       }
-      this.form.markAsPristine(); // para que el guard de salida no pregunte después de guardar
+
+      this.form.markAsPristine();
       this.toast.show(
         this.isEdit ? 'Cómic actualizado correctamente.' : 'Cómic creado correctamente.',
       );
@@ -228,8 +213,8 @@ export class ComicForm implements PendingChanges {
       title: comic.title,
       synopsis: comic.description,
       publisher: comic.publisher,
-      writers: comic.writers.map((p) => p.name).join(', '),
-      artists: comic.artists.map((p) => p.name).join(', '),
+      writers: comic.writers.map((person) => person.name).join(', '),
+      artists: comic.artists.map((person) => person.name).join(', '),
       status: comic.status,
       genres: [...comic.genres],
     };

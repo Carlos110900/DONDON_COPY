@@ -37,21 +37,39 @@ describe('ComicForm', () => {
     expect(component.form.controls.status.value).toBe('ongoing');
   });
 
-  it('exige sinopsis de al menos 20 caracteres', () => {
-    component.form.patchValue({ synopsis: 'muy corta' });
+  it('exige una sinopsis de al menos 20 caracteres', () => {
+    component.form.controls.synopsis.setValue('muy corta');
+
     expect(component.form.controls.synopsis.hasError('minlength')).toBe(true);
   });
 
-  it('exige al menos un género', () => {
+  it('exige al menos un tag', () => {
     expect(component.form.controls.genres.hasError('minSelected')).toBe(true);
-    component.form.patchValue({ genres: ['Acción'] });
+
+    component.form.controls.genres.setValue(['Acción']);
     expect(component.form.controls.genres.valid).toBe(true);
   });
 
   it('rechaza una portada que no es imagen y acepta no subir ninguna', () => {
     const cover = component.form.controls.cover;
     expect(cover.valid).toBe(true);
+
     cover.setValue(new File(['x'], 'nota.txt', { type: 'text/plain' }));
     expect(cover.hasError('coverType')).toBe(true);
+  });
+
+  it('es válido con todos los datos obligatorios', async () => {
+    component.form.patchValue({
+      title: 'Mi cómic',
+      synopsis: 'Una sinopsis con más de veinte caracteres.',
+      publisher: 'Editorial',
+      writers: 'Ana',
+      artists: 'Luis',
+      genres: ['Acción'],
+    });
+    await fixture.whenStable();
+    await new Promise((resolve) => setTimeout(resolve, 450));
+
+    expect(component.form.valid).toBe(true);
   });
 });

@@ -8,5 +8,6 @@ export interface PendingChanges {
 
 export const pendingChangesGuard: CanDeactivateFn<PendingChanges> = (component) => {
   if (!component.hasPendingChanges()) return true;
+
   return inject(Confirm).ask('Tienes cambios sin guardar. ¿Deseas salir sin guardarlos?');
 };

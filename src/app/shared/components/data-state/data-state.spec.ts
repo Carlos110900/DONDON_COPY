@@ -12,6 +12,7 @@ describe('DataState', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(DataState);
+    fixture.componentRef.setInput('kind', 'empty');
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

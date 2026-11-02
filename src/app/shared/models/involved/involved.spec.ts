@@ -1,22 +1,11 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { Involved } from './involved';
 
 describe('Involved', () => {
-  let component: Involved;
-  let fixture: ComponentFixture<Involved>;
+  it('exposes the role and role label', () => {
+    const involved = new Involved('Ana', 'writer');
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Involved],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(Involved);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(involved.isWriter).toBe(true);
+    expect(involved.isArtist).toBe(false);
+    expect(involved.roleLabel).toBe('Escritor');
   });
 });

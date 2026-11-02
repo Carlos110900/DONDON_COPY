@@ -17,7 +17,6 @@ export const routes: Routes = [
   { path: '', component: Landing, title: 'DonDoDontonbori' },
   { path: 'login', component: Login, title: 'Iniciar sesión' },
   { path: 'registro', component: Register, title: 'Crear cuenta' },
-
   { path: 'catalogo', component: Home, title: 'Cómics' },
   { path: 'comics/:id', component: Detail, title: 'Detalle del cómic' },
   { path: 'comics/:id/leer/:chapter', component: Reader, title: 'Lector' },
@@ -56,6 +55,19 @@ export const routes: Routes = [
         data: { roles: ['admin'] },
       },
     ],
+  },
+  { path: 'comics', component: ComicList, title: 'Mis cómics' },
+  {
+    path: 'comics/nuevo',
+    component: ComicForm,
+    title: 'Nuevo cómic',
+    canDeactivate: [pendingChangesGuard],
+  },
+  {
+    path: 'comics/:id/editar',
+    component: ComicForm,
+    title: 'Editar cómic',
+    canDeactivate: [pendingChangesGuard],
   },
 
   { path: '**', redirectTo: '' },

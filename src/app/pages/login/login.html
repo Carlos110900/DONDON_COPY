@@ -16,15 +16,14 @@
       />
     </app-form-field>
 
-    <!-- Solo demo: quitar cuando exista autenticación real -->
     <app-form-field
       label="Entrar como (solo demo)"
       inputId="login-role"
       [control]="form.controls.role"
     >
       <select id="login-role" formControlName="role">
-        @for (r of demoRoles; track r.value) {
-          <option [value]="r.value">{{ r.label }}</option>
+        @for (role of demoRoles; track role.value) {
+          <option [value]="role.value">{{ role.label }}</option>
         }
       </select>
     </app-form-field>

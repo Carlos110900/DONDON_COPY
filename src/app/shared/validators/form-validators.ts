@@ -22,6 +22,7 @@ export function sameAs(otherName: string): ValidatorFn {
   };
 }
 
+// minimo un tag
 // mínimo un elemento seleccionado
 export function minSelected(min: number): ValidatorFn {
   return (control): ValidationErrors | null => {
@@ -31,6 +32,7 @@ export function minSelected(min: number): ValidatorFn {
   };
 }
 
+// tamaño maximo de la portada 5 MB y si no poner la portada-default.png
 // portada: debe ser imagen y pesar máximo 5 MB
 export const coverFile: ValidatorFn = (control): ValidationErrors | null => {
   const file = control.value as File | null;

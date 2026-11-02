@@ -1,0 +1,192 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+enum RolUsuario {
+    LECTOR_ANONIMO,
+    LECTOR_REGISTRADO,
+    PUBLICADOR,
+    ADMINISTRADOR
+}
+
+enum EstadoCuenta {
+    ACTIVA,
+    BANEADA
+}
+
+enum EstadoComic {
+    EN_EMISION,
+    EN_PAUSA,
+    FINALIZADO
+}
+
+interface IAutenticable {
+    + loginGoogle(googleID: String): void
+    + cerrarSesion(): void
+}
+
+interface IGestionableFavoritos {
+    + agregarComicFavorito(comicId: UUID): void
+    + eliminarComicFavorito(comicId: UUID): void
+}
+
+interface ILectorCapitulos {
+    + leerCapitulo(capituloId: UUID): void
+}
+
+interface ISeguimientoLectura {
+    + marcarComoLeido(capituloId: UUID): void
+}
+
+interface IPublicableContenido {
+    + crearComic(data: ComicDTO): void
+    + subirCapitulo(comicId: UUID, files: File[]): void
+}
+
+interface IModeradorComentarios {
+    + eliminarComentario(comentarioId: UUID): void
+}
+
+interface IGestionTags {
+    + gestionarTags(tagId: UUID): void
+}
+
+interface IGestionUsuarios {
+    + cambiarRolUsuario(userId: UUID, nuevoRol: RolUsuario): void
+    + banearUsuario(userId: UUID, razon: String): void
+}
+
+interface IAlmacenamientoImagenes {
+    + subirImagen(archivo: File): String
+}
+
+abstract class S3Imagenes <<external>> implements IAlmacenamientoImagenes {
+    + subirImagen(archivo: File): String
+}
+
+class ServicioPublicacion implements IPublicableContenido {
+    + crearComic(data: ComicDTO): void
+    + subirCapitulo(comicId: UUID, files: File[]): void
+}
+
+class Usuario {
+    # id: UUIDd
+    # nombre: String
+    # correo: String
+    # googleToken: String
+    # preferencias: Object
+    # fechaRegistro: Date
+    # estado: EstadoCuenta
+    # iniciarSesion(idToken: String): void
+    # cerrarSesion(): void
+    # alternarFavorito(listaFavoritos: ListaFavoritos): Boolean
+}
+
+class LectorAnonimo extends Usuario implements ILectorCapitulos {
+    + leerCapitulo(capituloId: UUID): void
+}
+
+class LectorRegistrado extends Usuario implements IAutenticable, IGestionableFavoritos, ILectorCapitulos, ISeguimientoLectura {
+    # googleID: String
+    # tokenJWT: String
+    + loginGoogle(googleID: String): void
+    + cerrarSesion(): void
+    + agregarComicFavorito(comicId: UUID): void
+    + eliminarComicFavorito(comicId: UUID): void
+    + leerCapitulo(capituloId: UUID): void
+    + marcarComoLeido(capituloId: UUID): void
+}
+
+class Publicador extends LectorRegistrado implements IPublicableContenido {
+    + crearComic(data: ComicDTO): void
+    + subirCapitulo(comicId: UUID, files: File[]): void
+    + editarComicPropio(comicId: UUID): void
+}
+
+class Administrador extends LectorRegistrado implements IModeradorComentarios, IGestionTags, IGestionUsuarios {
+    + eliminarComentario(comentarioId: UUID): void
+    + gestionarTags(tagId: UUID): void
+    + cambiarRolUsuario(userId: UUID, nuevoRol: RolUsuario): void
+    + banearUsuario(userId: UUID, razon: String): void
+}
+
+class Comic {
+    - id: UUID
+    - title: String
+    - slug: String
+    - synopsis: String
+    - portada: String
+    - author: String
+    - estado: EstadoComic
+    - fechaCreacion: Date
+    - capituloList: List<Capitulo>
+    + editarDescripcion(descripcion: String): void
+    + subirCapitulo(): void
+}
+
+class Capitulo {
+    - id: UUID
+    - comicId: UUID
+    - number: Int
+    - title: String
+    - fechaCreacion: Date
+    - editorial: String
+    - leido: Boolean
+    - paginaActual: Int
+    - numeroPaginas: Int
+    - colaboradores: List<Map<Puesto, Nombre>>
+    + borrarCapitulo(id: UUID): void
+}
+
+class Tag {
+    - id: UUID
+    - name: String
+    - color: String
+    + agregarTag(nombre: String): void
+    + eliminarTag(tagId: UUID): void
+}
+
+class Reaccion {
+    # id: UUID
+    # nombre: String
+    # imagenKey: String
+    + publicar(usuario: Usuario, capitulo: Capitulo, imagen: ImagenReaccion): void
+    + borrar(id: UUID): void
+}
+
+class ReaccionPersonalizada extends Reaccion {
+    - usuarioId: UUID
+    - idImagen: UUID
+    - tag: Reaccion
+    + vincularImagen(imagen: String, tag: Reaccion): void
+}
+
+class Notificacion {
+    - id: UUID
+    - remitente: UUID
+    - destinatario: UUID
+    - fecha: Date
+    - leido: Boolean
+    + marcarComoLeida(): void
+    + generar(usuario: Usuario, capitulo: Capitulo): void
+    + enviar(): Boolean
+}
+
+class ListaFavoritos {
+    - id: UUID
+    - userId: UUID
+    - comics: List<Comic>
+    + agregarComic(id: UUID): void
+    + eliminarComic(id: UUID): void
+}
+
+ServicioPublicacion ..> IAlmacenamientoImagenes : usa
+Usuario "1" *-- "1" ListaFavoritos : posee
+ListaFavoritos "1" o-- "0..*" Comic : contiene
+Comic "1" *-- "1..*" Capitulo : contiene
+Comic "0..*" -- "0..*" Tag : clasificado con
+Capitulo "1" o-- "0..*" Reaccion : recibe
+Usuario "1" -- "0..*" Notificacion : recibe
+Usuario "1" -- "0.." Comic
+Usuario "1" -- "0.." Reaccion
+
+@enduml
