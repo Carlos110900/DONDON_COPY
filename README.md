@@ -1,5 +1,7 @@
 # DonDoDontonbori
 
+Dandadan, dandadan, dandadan, dandadan, dandadan Dandadan, dandadan, dandadan, dandadan, dandadan Dandadan, dandadan, dandadan, dandadan, dandadan Dandadan, dandadan, dandadan
+
 DonDoDontonbori es una plataforma web para leer mangas, cómics y novelas gráficas: busca en el catálogo, guarda tus favoritos y lee los capítulos en PDF directamente desde el navegador.
 
 Este proyecto fue generado con [Angular CLI](https://github.com/angular/angular-cli) versión 21.2.26.

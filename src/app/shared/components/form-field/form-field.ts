@@ -10,8 +10,11 @@ const MENSAJES_DEFAULT: Record<string, MessageFn> = {
   blank: () => 'No puede quedar en blanco.',
   email: () => 'Escribe un correo válido.',
   minlength: (d) => `Escribe al menos ${d['requiredLength']} caracteres.`,
+  maxlength: (d) => `No puede pasar de ${d['requiredLength']} caracteres.`,
   mismatch: () => 'Las contraseñas no coinciden.',
   minSelected: (d) => `Selecciona al menos ${d['required']}.`,
+  names: () => 'Cada nombre debe tener al menos 2 caracteres; sepáralos con comas.',
+  idTaken: () => 'Ya existe un cómic con ese título.',
   coverType: () => 'El archivo debe ser una imagen.',
   coverSize: () => 'La imagen no debe pesar más de 5 MB.',
 };

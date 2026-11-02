@@ -12,6 +12,7 @@ describe('PdfViewer', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(PdfViewer);
+    fixture.componentRef.setInput('url', '/chapter.pdf');
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

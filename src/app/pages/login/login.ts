@@ -5,7 +5,6 @@ import { FormField } from '../../shared/components/form-field/form-field';
 import { Role, Session } from '../../shared/services/session';
 import { Toast } from '../../shared/services/toast/toast';
 
-// ⚠️🐍 Despues quitar en el final, como lo ordena malfoid 🐍⚠️
 const DEMO_ROLES: { value: Role; label: string }[] = [
   { value: 'reader', label: 'Lector registrado' },
   { value: 'publisher', label: 'Publicador' },
@@ -30,7 +29,7 @@ export class Login {
   readonly form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    role: ['reader' as Role], // solo demo
+    role: ['reader' as Role],
   });
 
   submit(): void {
@@ -39,10 +38,10 @@ export class Login {
       this.toast.show('Revisa los campos marcados.', 'error');
       return;
     }
+
     this.enter(this.form.controls.email.value.split('@')[0]);
   }
 
-  // ⚠️🐍 Despues quitar en el final, como lo ordena malfoid 🐍⚠️
   loginWithGoogle(): void {
     this.enter('Usuario Google');
   }

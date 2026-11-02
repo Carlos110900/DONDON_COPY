@@ -1,10 +1,21 @@
-@if (comic(); as c) {
+@if (loading()) {
+  <app-data-state kind="loading" message="Cargando cómic…" />
+} @else if (error(); as err) {
+  <app-data-state
+    kind="error"
+    [message]="err.isNotFound ? 'Cómic no encontrado.' : err.message"
+    [retryable]="!err.isNotFound"
+    (retry)="reload()"
+  >
+    <a class="btn-back" routerLink="/catalogo">Volver a la lista</a>
+  </app-data-state>
+} @else if (comic(); as c) {
   <section class="detail">
     <div class="cover-column">
       <img class="cover" [src]="c.cover" [alt]="'Portada de ' + c.title" />
       <div class="actions">
         <app-heart [comicId]="c.id" />
-        <a class="btn-back" routerLink="/">Volver a la lista</a>
+        <a class="btn-back" routerLink="/catalogo">Volver a la lista</a>
       </div>
     </div>
 
@@ -13,6 +24,9 @@
       <p class="description">{{ c.description }}</p>
 
       <dl class="facts">
+        <dt>Estado</dt>
+        <dd>{{ c.statusLabel }}</dd>
+
         <dt>Editorial</dt>
         <dd>{{ c.publisher }}</dd>
 
@@ -48,9 +62,4 @@
       </div>
     </div>
   </section>
-} @else {
-  <div class="not-found">
-    <p>Cómic no encontrado.</p>
-    <a class="btn-back" routerLink="/">Volver a la lista</a>
-  </div>
 }

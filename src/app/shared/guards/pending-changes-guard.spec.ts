@@ -1,9 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Confirm } from '../services/confirm/confirm';
+
 import { pendingChangesGuard } from './pending-changes-guard';
 
 describe('pendingChangesGuard', () => {
+  beforeEach(() => TestBed.configureTestingModule({}));
+
   const run = (pending: boolean) =>
     TestBed.runInInjectionContext(() =>
       pendingChangesGuard(
@@ -20,7 +23,7 @@ describe('pendingChangesGuard', () => {
 
   it('pide confirmación si hay cambios', async () => {
     const confirm = TestBed.inject(Confirm);
-    const result = run(true) as Promise<boolean>;
+    const result = run(true);
 
     expect(confirm.message()).toContain('cambios sin guardar');
     confirm.answer(false);

@@ -2,12 +2,12 @@ import { inject } from '@angular/core';
 import { CanDeactivateFn } from '@angular/router';
 import { Confirm } from '../services/confirm/confirm';
 
-export interface HasPendingChanges {
+export interface PendingChanges {
   hasPendingChanges(): boolean;
 }
 
-export const pendingChangesGuard: CanDeactivateFn<HasPendingChanges> = (component) => {
+export const pendingChangesGuard: CanDeactivateFn<PendingChanges> = (component) => {
   if (!component.hasPendingChanges()) return true;
 
-  return inject(Confirm).ask('Tienes cambios sin guardar. ¿Deseas salir de todas formas?');
+  return inject(Confirm).ask('Tienes cambios sin guardar. ¿Deseas salir sin guardarlos?');
 };

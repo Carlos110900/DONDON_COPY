@@ -19,7 +19,6 @@ export class Register {
   private readonly session = inject(Session);
   private readonly router = inject(Router);
   private readonly toast = inject(Toast);
-
   protected readonly submitting = signal(false);
 
   readonly form = this.fb.group({
@@ -42,8 +41,8 @@ export class Register {
       this.toast.show('Revisa los campos marcados.', 'error');
       return;
     }
+
     this.submitting.set(true);
-    // ⚠️🐍Después cambiar con la connexion a la base de datos, bueno al servicio que lo conecta, porque exponer al front es malo🐍⚠️
     this.session.login('reader', this.form.controls.name.value);
     this.toast.show('Cuenta creada correctamente.');
     this.router.navigate(['/catalogo']).finally(() => this.submitting.set(false));

@@ -1,9 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { EMPTY, of } from 'rxjs';
 import { ComicRepository } from '../../../shared/repositories/comic-repository';
-import { LocalComicRepository } from '../../../shared/repositories/local-comic-repository';
-
 import { ComicForm } from './comic-form';
+
+const repositoryStub = {
+  getAll: () => of([]),
+  getById: () => EMPTY,
+  create: () => EMPTY,
+  update: () => EMPTY,
+  remove: () => EMPTY,
+  exists: () => of(false),
+};
 
 describe('ComicForm', () => {
   let component: ComicForm;
@@ -12,7 +20,7 @@ describe('ComicForm', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ComicForm],
-      providers: [provideRouter([]), { provide: ComicRepository, useClass: LocalComicRepository }],
+      providers: [provideRouter([]), { provide: ComicRepository, useValue: repositoryStub }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ComicForm);
@@ -29,8 +37,8 @@ describe('ComicForm', () => {
     expect(component.form.controls.status.value).toBe('ongoing');
   });
 
-  it('exige sinopsis de al menos 20 caracteres', () => {
-    component.form.patchValue({ synopsis: 'muy corta' });
+  it('exige una sinopsis de al menos 20 caracteres', () => {
+    component.form.controls.synopsis.setValue('muy corta');
 
     expect(component.form.controls.synopsis.hasError('minlength')).toBe(true);
   });
@@ -38,7 +46,7 @@ describe('ComicForm', () => {
   it('exige al menos un tag', () => {
     expect(component.form.controls.genres.hasError('minSelected')).toBe(true);
 
-    component.form.patchValue({ genres: ['Acción'] });
+    component.form.controls.genres.setValue(['Acción']);
     expect(component.form.controls.genres.valid).toBe(true);
   });
 
@@ -50,7 +58,7 @@ describe('ComicForm', () => {
     expect(cover.hasError('coverType')).toBe(true);
   });
 
-  it('es válido con todos los datos obligatorios', () => {
+  it('es válido con todos los datos obligatorios', async () => {
     component.form.patchValue({
       title: 'Mi cómic',
       synopsis: 'Una sinopsis con más de veinte caracteres.',
@@ -59,6 +67,8 @@ describe('ComicForm', () => {
       artists: 'Luis',
       genres: ['Acción'],
     });
+    await fixture.whenStable();
+    await new Promise((resolve) => setTimeout(resolve, 450));
 
     expect(component.form.valid).toBe(true);
   });
