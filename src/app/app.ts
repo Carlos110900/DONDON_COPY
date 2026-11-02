@@ -13,3 +13,8 @@ import { Header } from './layout/header/header';
 export class App {
   protected readonly title = signal('DonDoDontonbori');
 }
+
+/*
+cerrar porto
+netstat -ano | findstr :4200
+ */

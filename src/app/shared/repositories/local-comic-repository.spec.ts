@@ -14,10 +14,10 @@ describe('LocalComicRepository', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should expose only the available Batman chapter with its PDF path', () => {
+  it('should expose the available Batman chapters with their PDF paths', () => {
     const comic = service.getById('absolute-batman');
 
-    expect(comic?.chapters).toHaveLength(1);
+    expect(comic?.chapters).toHaveLength(4);
     expect(comic?.chapters[0].title).toBe('Absolute Batman #1');
     expect(comic?.chapters[0].pdfUrl).toBe(
       '/comics/absolute-batman/chapters/Absolute_Batman_1.pdf',
