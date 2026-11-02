@@ -18,86 +18,77 @@
         <p class="alert" role="alert">No se pudo guardar: {{ msg }}</p>
       }
 
-      <label class="field">
-        Título
-        <input formControlName="title" autocomplete="off" />
-        @if (errorMessage('title'); as msg) {
-          <small class="error">{{ msg }}</small>
-        } @else if (form.controls.title.pending) {
-          <small class="muted">Verificando disponibilidad…</small>
-        } @else if (!isEdit) {
+      <app-form-field label="Título" inputId="comic-title" [control]="form.controls.title">
+        <input id="comic-title" type="text" formControlName="title" autocomplete="off" />
+        @if (!isEdit) {
           <small class="muted">Identificador: {{ slugPreview() }}</small>
         }
-      </label>
+      </app-form-field>
 
-      <label class="field">
-        Sinopsis
-        <textarea formControlName="description" rows="4"></textarea>
-        @if (errorMessage('description'); as msg) {
-          <small class="error">{{ msg }}</small>
-        }
-      </label>
+      <app-form-field label="Sinopsis" inputId="comic-synopsis" [control]="form.controls.synopsis">
+        <textarea id="comic-synopsis" rows="4" formControlName="synopsis"></textarea>
+      </app-form-field>
 
-      <label class="field">
-        Editorial
-        <input formControlName="publisher" />
-        @if (errorMessage('publisher'); as msg) {
-          <small class="error">{{ msg }}</small>
-        }
-      </label>
+      <app-form-field
+        label="Editorial"
+        inputId="comic-publisher"
+        [control]="form.controls.publisher"
+      >
+        <input id="comic-publisher" type="text" formControlName="publisher" />
+      </app-form-field>
 
-      <label class="field">
-        Escritores
-        <input formControlName="writers" placeholder="Ej. Scott Snyder, Otro Autor" />
-        @if (errorMessage('writers'); as msg) {
-          <small class="error">{{ msg }}</small>
-        }
-      </label>
+      <app-form-field
+        label="Escritor(es), separados por coma"
+        inputId="comic-writers"
+        [control]="form.controls.writers"
+      >
+        <input id="comic-writers" type="text" formControlName="writers" />
+      </app-form-field>
 
-      <label class="field">
-        Dibujantes
-        <input formControlName="artists" placeholder="Ej. Nick Dragotta" />
-        @if (errorMessage('artists'); as msg) {
-          <small class="error">{{ msg }}</small>
-        }
-      </label>
+      <app-form-field
+        label="Dibujante(s), separados por coma"
+        inputId="comic-artists"
+        [control]="form.controls.artists"
+      >
+        <input id="comic-artists" type="text" formControlName="artists" />
+      </app-form-field>
 
-      <label class="field">
-        Estado
-        <select formControlName="status">
-          <option value="ongoing">En curso</option>
-          <option value="completed">Finalizado</option>
+      <app-form-field label="Estado" inputId="comic-status" [control]="form.controls.status">
+        <select id="comic-status" formControlName="status">
+          @for (s of statuses; track s.value) {
+            <option [value]="s.value">{{ s.label }}</option>
+          }
         </select>
-      </label>
+      </app-form-field>
 
-      <fieldset class="field">
-        <legend>Géneros</legend>
-        @for (genre of genreOptions; track genre) {
-          <label class="check">
-            <input
-              type="checkbox"
-              [checked]="isGenreChecked(genre)"
-              (change)="toggleGenre(genre, $event)"
-            />
-            {{ genre }}
-          </label>
-        }
-        @if (errorMessage('genres'); as msg) {
-          <small class="error">{{ msg }}</small>
-        }
-      </fieldset>
+      <app-form-field
+        [control]="form.controls.genres"
+        [messages]="{ minSelected: 'Selecciona al menos un género.' }"
+      >
+        <fieldset class="tags">
+          <legend>Géneros</legend>
+          @for (genre of genreOptions; track genre) {
+            <label class="check">
+              <input type="checkbox" [checked]="isSelected(genre)" (change)="toggleGenre(genre)" />
+              {{ genre }}
+            </label>
+          }
+        </fieldset>
+      </app-form-field>
 
-      <label class="field">
-        Portada (ruta en public)
-        <input formControlName="cover" placeholder="/comics/mi-comic/cover/mi-comic.jpg" />
-        @if (errorMessage('cover'); as msg) {
-          <small class="error">{{ msg }}</small>
-        }
-      </label>
+      <app-form-field label="Portada" inputId="comic-cover" [control]="form.controls.cover">
+        <img
+          class="cover-preview"
+          [src]="cover()"
+          alt="Vista previa de la portada"
+          (error)="onCoverError()"
+        />
+        <input id="comic-cover" type="file" accept="image/*" (change)="onCoverChange($event)" />
+      </app-form-field>
 
       <div class="row">
-        <button type="submit" class="btn btn-primary" [disabled]="saving()">
-          {{ saving() ? 'Guardando…' : 'Guardar' }}
+        <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+          {{ submitting() ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Guardar' }}
         </button>
         <a class="btn" routerLink="/panel/comics">Cancelar</a>
       </div>

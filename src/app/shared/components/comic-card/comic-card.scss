@@ -17,8 +17,11 @@
 }
 
 .cover-link {
+  position: relative;
   display: block;
   overflow: hidden;
+  aspect-ratio: 2 / 3;
+  background: var(--border);
 }
 
 .cover {
@@ -27,6 +30,39 @@
   aspect-ratio: 2 / 3;
   object-fit: cover;
   background: var(--border);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.cover.is-loaded {
+  opacity: 1;
+}
+
+.cover-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.cover-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--muted);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: cover-spin 0.8s linear infinite;
+}
+
+@keyframes cover-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .body {

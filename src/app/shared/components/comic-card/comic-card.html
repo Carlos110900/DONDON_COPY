@@ -4,7 +4,24 @@
     class="cover-link"
     [attr.aria-label]="'Ver detalles de ' + comic().title"
   >
-    <img class="cover" [src]="comic().cover" [alt]="'Portada de ' + comic().title" loading="lazy" />
+    @if (coverState() === 'loading') {
+      <span class="cover-status" role="status">
+        <span class="cover-spinner" aria-hidden="true"></span>
+        Cargando portada…
+      </span>
+    } @else if (coverState() === 'error') {
+      <span class="cover-status" role="status">No se pudo cargar la portada.</span>
+    }
+    <img
+      #cover
+      class="cover"
+      [class.is-loaded]="coverState() === 'loaded'"
+      [src]="comic().cover"
+      [alt]="'Portada de ' + comic().title"
+      loading="lazy"
+      (load)="coverState.set('loaded')"
+      (error)="coverState.set('error')"
+    />
   </a>
   <div class="body">
     <h3 class="title">{{ comic().title }}</h3>
