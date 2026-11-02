@@ -1,4 +1,4 @@
-import { Component, computed, inject, linkedSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal } from '@angular/core';
 import { ComicCard } from '../../../shared/components/comic-card/comic-card';
 import { DataState } from '../../../shared/components/data-state/data-state';
 import { Pagination } from '../../../shared/components/pagination/pagination';
@@ -11,6 +11,7 @@ import { paginate } from '../../../shared/utils/paginate';
   imports: [ComicCard, DataState, Pagination],
   templateUrl: './home.html',
   styleUrl: './home.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home {
   protected readonly store = inject(ComicStore);

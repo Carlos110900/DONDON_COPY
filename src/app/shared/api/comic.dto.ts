@@ -1,4 +1,4 @@
-import { ComicStatus } from '../models/comic';
+import { ComicStatus } from '../models/comic-status';
 import { InvolvedRole } from '../models/involved/involved';
 
 export interface InvolvedDto {
@@ -18,8 +18,8 @@ export interface ComicDto {
   description: string;
   cover: string;
   publisher: string;
-  status: ComicStatus;
   genres: string[];
+  status: ComicStatus;
   involved: InvolvedDto[];
   chapters: ChapterDto[];
 }

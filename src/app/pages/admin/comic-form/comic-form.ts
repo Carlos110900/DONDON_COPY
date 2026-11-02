@@ -1,47 +1,64 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import {
+  FormControl,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { of } from 'rxjs';
-import { ApiError } from '../../../shared/api/api-error';
 import { ComicInput } from '../../../shared/api/comic.dto';
 import { DataState } from '../../../shared/components/data-state/data-state';
+import { FormField } from '../../../shared/components/form-field/form-field';
 import { PendingChanges } from '../../../shared/guards/pending-changes-guard';
-import { Comic, ComicStatus } from '../../../shared/models/comic';
+import { Comic, DEFAULT_COVER } from '../../../shared/models/comic';
+import { COMIC_STATUSES, ComicStatus } from '../../../shared/models/comic-status';
 import { ComicRepository } from '../../../shared/repositories/comic-repository';
 import { ComicStore } from '../../../shared/services/comic-store';
 import { Toast } from '../../../shared/services/toast/toast';
+import { compressImage } from '../../../shared/utils/image';
 import { loadResource } from '../../../shared/utils/load-resource';
 import { slugify } from '../../../shared/utils/slugify';
 import {
+  coverFile,
   minSelected,
   namesList,
-  noBlank,
+  notBlank,
   parseNames,
-  publicAsset,
   uniqueComicId,
-} from '../../../shared/validators/comic-validators';
+} from '../../../shared/validators/form-validators';
 
-type FieldName =
-  'title' | 'description' | 'publisher' | 'cover' | 'status' | 'genres' | 'writers' | 'artists';
+const SYNOPSIS_MINIMA = 20;
 
 @Component({
   selector: 'app-comic-form',
-  imports: [ReactiveFormsModule, RouterLink, DataState],
+  imports: [ReactiveFormsModule, RouterLink, FormField, DataState],
   templateUrl: './comic-form.html',
   styleUrl: './comic-form.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComicForm implements PendingChanges {
   private readonly fb = inject(NonNullableFormBuilder);
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly repository = inject(ComicRepository);
   private readonly store = inject(ComicStore);
   private readonly toast = inject(Toast);
+  private readonly destroyRef = inject(DestroyRef);
 
   /** null = alta; con valor = edición. */
   private readonly editingId = this.route.snapshot.paramMap.get('id');
   protected readonly isEdit = this.editingId !== null;
 
+  protected readonly statuses = COMIC_STATUSES;
   protected readonly genreOptions = [
     'Acción',
     'Aventura',
@@ -56,22 +73,31 @@ export class ComicForm implements PendingChanges {
     'Terror',
   ];
 
-  protected readonly form = this.fb.group({
-    title: ['', [Validators.required, noBlank, Validators.minLength(3), Validators.maxLength(80)]],
-    description: [
-      '',
-      [Validators.required, noBlank, Validators.minLength(20), Validators.maxLength(500)],
-    ],
-    publisher: ['', [Validators.required, noBlank]],
-    cover: ['', [Validators.required, publicAsset(['jpg', 'jpeg', 'png', 'webp'])]],
-    status: this.fb.control<ComicStatus>('ongoing', Validators.required),
-    genres: this.fb.control<string[]>([], minSelected(1)),
-    writers: ['', [Validators.required, namesList]],
-    artists: ['', [Validators.required, namesList]],
-  });
-
-  protected readonly saving = signal(false);
+  protected readonly submitting = signal(false);
   protected readonly submitError = signal<string | null>(null);
+  protected readonly cover = signal(DEFAULT_COVER);
+
+  private savedCover = DEFAULT_COVER;
+  private objectUrl: string | null = null;
+
+  readonly form = this.fb.group({
+    title: ['', [Validators.required, notBlank, Validators.minLength(3), Validators.maxLength(80)]],
+    synopsis: [
+      '',
+      [
+        Validators.required,
+        notBlank,
+        Validators.minLength(SYNOPSIS_MINIMA),
+        Validators.maxLength(500),
+      ],
+    ],
+    publisher: ['', [Validators.required, notBlank]],
+    writers: ['', [Validators.required, notBlank, namesList]],
+    artists: ['', [Validators.required, notBlank, namesList]],
+    status: this.fb.control<ComicStatus>('ongoing'),
+    genres: this.fb.control<string[]>([], minSelected(1)),
+    cover: new FormControl<File | null>(null, coverFile),
+  });
 
   // En edición se carga el cómic desde la API; en alta no hay nada que cargar.
   private readonly resource = this.editingId
@@ -81,15 +107,19 @@ export class ComicForm implements PendingChanges {
   protected readonly loadError = computed(() => this.resource?.error() ?? null);
 
   constructor() {
+    this.destroyRef.onDestroy(() => this.releaseObjectUrl());
+
     if (!this.isEdit) {
-      // Solo en alta: el id nuevo (slug del título) no puede existir ya
       this.form.controls.title.addAsyncValidators(uniqueComicId(this.repository));
     }
 
     // Edición precargada: reset() rellena el formulario y lo deja pristine
     effect(() => {
       const comic = this.resource?.data();
-      if (comic) this.form.reset(this.toFormValue(comic));
+      if (!comic) return;
+      this.form.reset(this.toFormValue(comic));
+      this.savedCover = comic.cover;
+      this.cover.set(comic.cover);
     });
   }
 
@@ -105,43 +135,44 @@ export class ComicForm implements PendingChanges {
     return slugify(this.form.controls.title.value) || 'mi-comic';
   }
 
-  protected isGenreChecked(genre: string): boolean {
-    return this.form.controls.genres.value.includes(genre);
+  protected isSelected(name: string): boolean {
+    return this.form.controls.genres.value.includes(name);
   }
 
-  protected toggleGenre(genre: string, event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
+  protected toggleGenre(name: string): void {
     const control = this.form.controls.genres;
     control.setValue(
-      checked ? [...control.value, genre] : control.value.filter((g) => g !== genre),
+      this.isSelected(name) ? control.value.filter((g) => g !== name) : [...control.value, name],
     );
     control.markAsDirty();
     control.markAsTouched();
   }
 
-  protected errorMessage(name: FieldName): string | null {
-    const control = this.form.controls[name];
-    const errors = control.errors;
-    if (!errors || !(control.touched || control.dirty)) return null;
+  protected onCoverChange(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.item(0) ?? null;
+    const control = this.form.controls.cover;
+    control.setValue(file);
+    control.markAsDirty();
+    control.markAsTouched();
 
-    if (errors['required'] || errors['blank']) return 'Este campo es obligatorio.';
-    if (errors['minlength'])
-      return `Escribe al menos ${errors['minlength'].requiredLength} caracteres.`;
-    if (errors['maxlength'])
-      return `No puede pasar de ${errors['maxlength'].requiredLength} caracteres.`;
-    if (errors['assetPath']) {
-      const exts = (errors['assetPath'].extensions as string[]).map((e) => `.${e}`).join(', ');
-      return `Usa una ruta dentro de public que empiece con "/" y termine en ${exts}.`;
+    this.releaseObjectUrl();
+    if (file && control.valid) {
+      this.objectUrl = URL.createObjectURL(file);
+      this.cover.set(this.objectUrl);
+    } else {
+      this.cover.set(this.savedCover);
     }
-    if (errors['minSelected']) return 'Elige al menos un género.';
-    if (errors['names'])
-      return 'Cada nombre debe tener al menos 2 caracteres; sepáralos con comas.';
-    if (errors['idTaken']) return 'Ya existe un cómic con ese título.';
-    return 'Valor no válido.';
+  }
+
+  // usar imagen por defecto si algo sale mal
+  protected onCoverError(): void {
+    if (this.cover() !== DEFAULT_COVER) {
+      this.cover.set(DEFAULT_COVER);
+    }
   }
 
   protected async submit(): Promise<void> {
-    if (this.saving()) return;
+    if (this.submitting()) return;
 
     if (this.form.invalid || this.form.pending) {
       this.form.markAllAsTouched();
@@ -149,11 +180,11 @@ export class ComicForm implements PendingChanges {
       return;
     }
 
-    this.saving.set(true);
+    this.submitting.set(true);
     this.submitError.set(null);
-    const input = this.toInput();
 
     try {
+      const input = await this.toInput();
       if (this.editingId) {
         await this.store.update(this.editingId, input);
       } else {
@@ -165,21 +196,23 @@ export class ComicForm implements PendingChanges {
       );
       await this.router.navigate(['/panel/comics']);
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'No se pudo guardar el cómic.';
+      const message = error instanceof Error ? error.message : 'No se pudo guardar el cómic.';
       this.submitError.set(message);
       this.toast.show(message, 'error');
     } finally {
-      this.saving.set(false);
+      this.submitting.set(false);
     }
   }
 
-  private toInput(): ComicInput {
+  private async toInput(): Promise<ComicInput> {
     const value = this.form.getRawValue();
+    const cover = value.cover ? await compressImage(value.cover) : this.savedCover;
+
     return {
       title: value.title.trim(),
-      description: value.description.trim(),
+      description: value.synopsis.trim(),
       publisher: value.publisher.trim(),
-      cover: value.cover.trim(),
+      cover,
       status: value.status,
       genres: value.genres,
       involved: [
@@ -192,13 +225,19 @@ export class ComicForm implements PendingChanges {
   private toFormValue(comic: Comic) {
     return {
       title: comic.title,
-      description: comic.description,
+      synopsis: comic.description,
       publisher: comic.publisher,
-      cover: comic.cover,
-      status: comic.status,
-      genres: [...comic.genres],
       writers: comic.writers.map((p) => p.name).join(', '),
       artists: comic.artists.map((p) => p.name).join(', '),
+      status: comic.status,
+      genres: [...comic.genres],
     };
+  }
+
+  private releaseObjectUrl(): void {
+    if (this.objectUrl) {
+      URL.revokeObjectURL(this.objectUrl);
+      this.objectUrl = null;
+    }
   }
 }

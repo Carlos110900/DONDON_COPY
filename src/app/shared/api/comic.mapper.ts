@@ -11,8 +11,8 @@ export function toComic(dto: ComicDto): Comic {
     dto.cover,
     dto.publisher,
     dto.genres ?? [],
-    dto.status,
     (dto.involved ?? []).map((i) => new Involved(i.name, i.role)),
     (dto.chapters ?? []).map((c) => new Chapter(c.number, c.title, c.pdfUrl)),
+    dto.status,
   );
 }
