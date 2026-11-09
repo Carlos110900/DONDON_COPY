@@ -47,6 +47,7 @@
                 <a class="btn" [routerLink]="['/comics', comic.id]">Ver</a>
                 <a class="btn" [routerLink]="['/panel/comics', comic.id, 'editar']">Editar</a>
                 <button
+                  *appHasRole="['admin']"
                   type="button"
                   class="btn btn-danger"
                   [disabled]="deletingId() === comic.id"
