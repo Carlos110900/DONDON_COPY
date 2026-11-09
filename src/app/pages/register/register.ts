@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+
 import { FormField } from '../../shared/components/form-field/form-field';
-import { Session } from '../../shared/services/session';
+import { Auth } from '../../shared/services/auth/auth';
 import { Toast } from '../../shared/services/toast/toast';
 import { notBlank, sameAs } from '../../shared/validators/form-validators';
 
@@ -16,15 +18,16 @@ import { notBlank, sameAs } from '../../shared/validators/form-validators';
 })
 export class Register {
   private readonly fb = inject(NonNullableFormBuilder);
-  private readonly session = inject(Session);
-  private readonly router = inject(Router);
+  private readonly auth = inject(Auth);
+  private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(Toast);
   protected readonly submitting = signal(false);
+  protected readonly submitError = signal<string | null>(null);
 
   readonly form = this.fb.group({
-    name: ['', [Validators.required, notBlank]],
+    name: ['', [Validators.required, notBlank, Validators.maxLength(60)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
     confirm: ['', [Validators.required, sameAs('password')]],
     accepted: [false, [Validators.requiredTrue]],
   });
@@ -41,10 +44,21 @@ export class Register {
       this.toast.show('Revisa los campos marcados.', 'error');
       return;
     }
+    if (this.submitting()) return;
 
     this.submitting.set(true);
-    this.session.login('reader', this.form.controls.name.value);
-    this.toast.show('Cuenta creada correctamente.');
-    this.router.navigate(['/catalogo']).finally(() => this.submitting.set(false));
+    this.submitError.set(null);
+
+    const { name, email, password } = this.form.getRawValue();
+    this.auth
+      .register({ name: name.trim(), email, password })
+      .pipe(finalize(() => this.submitting.set(false)))
+      .subscribe({
+        next: (user) => {
+          this.toast.show('Cuenta creada correctamente.');
+          void this.auth.goAfterAuth(user, this.route.snapshot.queryParamMap.get('returnUrl'));
+        },
+        error: (error: Error) => this.submitError.set(error.message),
+      });
   }
 }

@@ -3,6 +3,10 @@
     <h1>Crear cuenta</h1>
     <p class="muted">Elige cómo quieres que te veamos.</p>
 
+    @if (submitError(); as message) {
+      <p class="alert" role="alert">{{ message }}</p>
+    }
+
     <app-form-field label="Nombre o nickname" inputId="reg-name" [control]="form.controls.name">
       <input id="reg-name" type="text" formControlName="name" autocomplete="nickname" />
     </app-form-field>
@@ -44,7 +48,7 @@
     </app-form-field>
 
     <button type="submit" class="btn btn-primary" [disabled]="submitting()">
-      Aceptar y crear cuenta
+      {{ submitting() ? 'Creando cuenta…' : 'Aceptar y crear cuenta' }}
     </button>
 
     <p class="muted">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>

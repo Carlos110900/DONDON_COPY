@@ -3,6 +3,13 @@
     <h1>Iniciar sesión</h1>
     <p class="muted">Entra con tu correo o con tu cuenta de Google.</p>
 
+    @if (sessionExpired()) {
+      <p class="alert" role="alert">Tu sesión expiró o ya no es válida. Inicia sesión de nuevo.</p>
+    }
+    @if (submitError(); as message) {
+      <p class="alert" role="alert">{{ message }}</p>
+    }
+
     <app-form-field label="Correo" inputId="login-email" [control]="form.controls.email">
       <input id="login-email" type="email" formControlName="email" autocomplete="email" />
     </app-form-field>
@@ -16,22 +23,12 @@
       />
     </app-form-field>
 
-    <app-form-field
-      label="Entrar como (solo demo)"
-      inputId="login-role"
-      [control]="form.controls.role"
-    >
-      <select id="login-role" formControlName="role">
-        @for (role of demoRoles; track role.value) {
-          <option [value]="role.value">{{ role.label }}</option>
-        }
-      </select>
-    </app-form-field>
-
-    <button type="submit" class="btn btn-primary" [disabled]="submitting()">Iniciar sesión</button>
-    <button type="button" class="btn" [disabled]="submitting()" (click)="loginWithGoogle()">
-      Continuar con Google
+    <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+      {{ submitting() ? 'Entrando…' : 'Iniciar sesión' }}
     </button>
+
+    <p class="muted divider">o</p>
+    <div #googleButton class="google-button"></div>
 
     <p class="muted">¿Primera vez? <a routerLink="/registro">Crea tu cuenta</a></p>
   </form>

@@ -1,15 +1,23 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  afterNextRender,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { FormField } from '../../shared/components/form-field/form-field';
-import { Role, Session } from '../../shared/services/session';
-import { Toast } from '../../shared/services/toast/toast';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Observable, finalize } from 'rxjs';
 
-const DEMO_ROLES: { value: Role; label: string }[] = [
-  { value: 'reader', label: 'Lector registrado' },
-  { value: 'publisher', label: 'Publicador' },
-  { value: 'admin', label: 'Administrador' },
-];
+import { environment } from '../../../environments/environment';
+import { AuthUserDto } from '../../shared/api/auth.dto';
+import { FormField } from '../../shared/components/form-field/form-field';
+import { Auth } from '../../shared/services/auth/auth';
+import { GoogleIdentity } from '../../shared/services/auth/google-identity';
+import { Session } from '../../shared/services/session';
+import { Toast } from '../../shared/services/toast/toast';
 
 @Component({
   selector: 'app-login',
@@ -20,17 +28,29 @@ const DEMO_ROLES: { value: Role; label: string }[] = [
 })
 export class Login {
   private readonly fb = inject(NonNullableFormBuilder);
-  private readonly session = inject(Session);
-  private readonly router = inject(Router);
+  private readonly auth = inject(Auth);
+  private readonly google = inject(GoogleIdentity);
+  private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(Toast);
-  protected readonly demoRoles = DEMO_ROLES;
+  protected readonly sessionExpired = inject(Session).expiredNotice;
   protected readonly submitting = signal(false);
+  protected readonly submitError = signal<string | null>(null);
+  private readonly googleButton = viewChild<ElementRef<HTMLElement>>('googleButton');
 
   readonly form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    role: ['reader' as Role],
   });
+
+  constructor() {
+    afterNextRender(() => {
+      const host = this.googleButton()?.nativeElement;
+      if (!host || !environment.googleClientId) return;
+      this.google
+        .renderButton(host, (idToken) => this.run(this.auth.loginWithGoogle(idToken)))
+        .catch(() => this.submitError.set('No se pudo cargar el inicio de sesión con Google.'));
+    });
+  }
 
   submit(): void {
     if (this.form.invalid) {
@@ -38,21 +58,23 @@ export class Login {
       this.toast.show('Revisa los campos marcados.', 'error');
       return;
     }
-
-    this.enter(this.form.controls.email.value.split('@')[0]);
+    this.run(this.auth.login(this.form.getRawValue()));
   }
 
-  loginWithGoogle(): void {
-    this.enter('Usuario Google');
-  }
-
-  private enter(name: string): void {
+  private run(request$: Observable<AuthUserDto>): void {
+    if (this.submitting()) return;
     this.submitting.set(true);
-    const { role } = this.form.getRawValue();
-    this.session.login(role, name);
-    this.toast.show('¡Bienvenido de nuevo!');
-    this.router
-      .navigate([role === 'reader' ? '/catalogo' : '/panel'])
-      .finally(() => this.submitting.set(false));
+    this.submitError.set(null);
+
+    request$.pipe(finalize(() => this.submitting.set(false))).subscribe({
+      next: (user) => {
+        this.toast.show('¡Bienvenido de nuevo!');
+        void this.auth.goAfterAuth(user, this.route.snapshot.queryParamMap.get('returnUrl'));
+      },
+      error: (error: Error) => {
+        this.submitError.set(error.message);
+        this.form.controls.password.reset();
+      },
+    });
   }
 }
