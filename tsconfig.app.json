@@ -8,10 +8,5 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "src/**/*.spec.ts",
-    "src/config/**/*.ts",
-    "src/dataBase/**/*.ts",
-    "src/middleware/**/*.ts"
-  ]
+  "exclude": ["src/**/*.spec.ts", "src/trash/**/*.ts"]
 }
