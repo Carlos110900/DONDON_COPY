@@ -1,0 +1,103 @@
+<section class="page">
+  @if (loading()) {
+    <app-data-state kind="loading" message="Cargando cómic…" />
+  } @else if (loadError(); as err) {
+    <app-data-state
+      kind="error"
+      [message]="err.isNotFound ? 'Ese cómic no existe.' : err.message"
+      [retryable]="!err.isNotFound"
+      (retry)="reload()"
+    >
+      <a class="btn" routerLink="/panel/comics">Volver a mis cómics</a>
+    </app-data-state>
+  } @else {
+    <form class="card form-card wide" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <h1>{{ isEdit ? 'Editar cómic' : 'Nuevo cómic' }}</h1>
+
+      @if (submitError(); as message) {
+        <p class="alert" role="alert">No se pudo guardar: {{ message }}</p>
+      }
+
+      <app-form-field label="Título" inputId="comic-title" [control]="form.controls.title">
+        <input id="comic-title" type="text" formControlName="title" autocomplete="off" />
+        @if (!isEdit) {
+          <small class="muted">Identificador: {{ slugPreview() }}</small>
+        }
+      </app-form-field>
+
+      <app-form-field label="Sinopsis" inputId="comic-synopsis" [control]="form.controls.synopsis">
+        <textarea id="comic-synopsis" rows="4" formControlName="synopsis"></textarea>
+      </app-form-field>
+
+      <app-form-field
+        label="Editorial"
+        inputId="comic-publisher"
+        [control]="form.controls.publisher"
+      >
+        <input id="comic-publisher" type="text" formControlName="publisher" />
+      </app-form-field>
+
+      <app-form-field
+        label="Escritor(es), separados por coma"
+        inputId="comic-writers"
+        [control]="form.controls.writers"
+      >
+        <input id="comic-writers" type="text" formControlName="writers" />
+      </app-form-field>
+
+      <app-form-field
+        label="Dibujante(s), separados por coma"
+        inputId="comic-artists"
+        [control]="form.controls.artists"
+      >
+        <input id="comic-artists" type="text" formControlName="artists" />
+      </app-form-field>
+
+      <app-form-field label="Estado" inputId="comic-status" [control]="form.controls.status">
+        <select id="comic-status" formControlName="status">
+          @for (status of statuses; track status.value) {
+            <option [value]="status.value">{{ status.label }}</option>
+          }
+        </select>
+      </app-form-field>
+
+      <app-form-field
+        [control]="form.controls.genres"
+        [messages]="{ minSelected: 'Selecciona al menos un tag.' }"
+      >
+        <fieldset class="tags">
+          <legend>Tags</legend>
+          @for (tag of tags(); track tag.id) {
+            <label class="check">
+              <input
+                type="checkbox"
+                [checked]="isSelected(tag.name)"
+                (change)="toggleTag(tag.name)"
+              />
+              {{ tag.name }}
+            </label>
+          } @empty {
+            <p class="muted">Aún no hay tags. Crea uno desde el administrador de tags.</p>
+          }
+        </fieldset>
+      </app-form-field>
+
+      <app-form-field label="Portada" inputId="comic-cover" [control]="form.controls.cover">
+        <img
+          class="cover-preview"
+          [src]="cover()"
+          alt="Vista previa de la portada"
+          (error)="onCoverError()"
+        />
+        <input id="comic-cover" type="file" accept="image/*" (change)="onCoverChange($event)" />
+      </app-form-field>
+
+      <div class="row">
+        <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+          {{ submitting() ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Guardar' }}
+        </button>
+        <a class="btn" routerLink="/panel/comics">Cancelar</a>
+      </div>
+    </form>
+  }
+</section>
