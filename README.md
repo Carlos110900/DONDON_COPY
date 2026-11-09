@@ -81,11 +81,12 @@ Para más información sobre Angular CLI y sus comandos, consulta la [referencia
 
 ```bash
 npm install
-npm run dev      # API en http://localhost:3000 + frontend en http://localhost:4200
-# o por separado: npm run api   y   npm start
+npm run dev       # Express en http://localhost:3000 + Angular en http://localhost:4200
+# requiere las variables del backend en .env (raíz del proyecto)
+# json-server opcional: npm run api (puerto 3001)
 ```
 
-La URL base de la API está en `src/environments/environment*.ts` (`apiUrl`).
+Las URLs base están en `src/environments/environment*.ts` (`apiUrl` y `authUrl` apuntan a Express).
 
 ### Contrato de API (recurso `comics`)
 
@@ -143,3 +144,83 @@ Un solo componente reactivo (`ComicForm`) sirve para alta (`/panel/comics/nuevo`
 - Autenticación real (Login y Registro siguen simulados).
 - Usuarios del panel y favoritos (persisten solo en memoria).
 - Subida de archivos (la portada se captura como ruta en `public`).
+-
+
+## Fuente de autenticación y justificación
+
+API propia en Node/Express (`backend/`) con MongoDB (Mongoose) y JWT.
+Se eligió porque el proyecto ya usa MongoDB y Google Identity Services, y porque permite
+**validar el rol en el servidor**: ocultar un botón en Angular no basta, la API responde 401/403.
+
+- Contraseñas con **bcrypt** (12 rondas). Nunca se guardan ni se devuelven en texto plano.
+- Login con credenciales locales y con **Google** (el frontend manda el ID token y la API lo valida con `google-auth-library`).
+- Entradas validadas con **Zod** (esquemas `strict`, solo strings) y `sanitizeFilter` de Mongoose contra inyección NoSQL.
+- `helmet`, `cors` con lista de orígenes y `express-rate-limit` en login/registro/google.
+
+## Token: manejo y almacenamiento
+
+- JWT firmado (HS256) con duración de **72 horas**. Lleva solo el id del usuario (`sub`) y una versión (`tv`).
+- El **rol no va en el token**: la API lo lee de MongoDB en cada petición. Si cambias un rol o suspendes una cuenta, el efecto es inmediato.
+- **Cerrar sesión** sube `tokenVersion` en la BD, así el token deja de servir aunque no haya vencido.
+- En el navegador se guarda en `localStorage` (`dondo.token`). Al recargar, la app llama a `GET /auth/me` para recuperar el usuario y el rol **antes** de la primera navegación.
+- `authInterceptor` agrega `Authorization: Bearer …` solo a peticiones hacia nuestras APIs.
+- `errorInterceptor` es el único lugar donde se maneja el 401 (limpia sesión y manda a `/login?returnUrl=…` con aviso) y donde se arma el mensaje del 403.
+
+## Roles y permisos
+
+El rol sale de la sesión (login o `/auth/me`). Los usuarios nuevos nacen como `reader`; `publisher` y `admin` se asignan desde MongoDB o por un admin en `/panel/usuarios`.
+
+| Acción                                 | Visitante | Lector (`reader`) | Publicador (`publisher`) | Administrador (`admin`) |
+| -------------------------------------- | :-------: | :---------------: | :----------------------: | :---------------------: |
+| Ver catálogo, detalle y leer capítulos |     ✔     |         ✔         |            ✔             |            ✔            |
+| Favoritos                              |     ✘     |         ✔         |            ✔             |            ✔            |
+| Entrar al panel                        |     ✘     |         ✘         |            ✔             |            ✔            |
+| Crear cómic                            |     ✘     |         ✘         |            ✔             |            ✔            |
+| Editar cómic                           |     ✘     |         ✘         |    ✔ (solo los suyos)    |     ✔ (cualquiera)      |
+| **Eliminar cómic**                     |     ✘     |         ✘         |            ✘             |            ✔            |
+| Crear / renombrar / eliminar tags      |     ✘     |         ✘         |            ✘             |            ✔            |
+| Ver usuarios, cambiar rol, suspender   |     ✘     |         ✘         |            ✘             |            ✔            |
+
+Códigos: sin sesión → **401**; sesión sin permiso → **403** (la interfaz muestra el mensaje y no cambia el estado).
+
+## Endpoints
+
+| Método            | Ruta                     | Quién                     |
+| ----------------- | ------------------------ | ------------------------- |
+| POST              | `/auth/register`         | público                   |
+| POST              | `/auth/login`            | público                   |
+| POST              | `/auth/google`           | público                   |
+| GET               | `/auth/me`               | sesión                    |
+| POST              | `/auth/logout`           | sesión                    |
+| PATCH             | `/users/me`              | sesión                    |
+| GET               | `/users`, `/users/:id`   | admin                     |
+| PATCH             | `/users/:id/role`        | admin                     |
+| PATCH             | `/users/:id/status`      | admin                     |
+| DELETE            | `/users/:id`             | admin                     |
+| GET               | `/comics`, `/comics/:id` | público                   |
+| POST              | `/comics`                | publisher, admin          |
+| PATCH             | `/comics/:id`            | dueño (publisher) o admin |
+| DELETE            | `/comics/:id`            | admin                     |
+| GET               | `/tags`                  | público                   |
+| POST/PATCH/DELETE | `/tags…`                 | admin                     |
+
+## Variables de entorno
+
+Copia `.env.example` a `.env` y llena los valores (el `.env` real **no** se sube al repositorio).
+Además, `src/environments/environment*.ts` lleva `authUrl` y `googleClientId` (el ID de cliente de Google es público).
+
+## Cómo correrlo
+
+```bash
+npm install
+npm run seed      # crea usuarios de prueba y tags (solo desarrollo)
+npm run dev       # json-server :3000 + API :3001 + Angular :4200
+```
+
+## Usuarios de prueba
+
+| Rol           | Correo                  | Contraseña       |
+| ------------- | ----------------------- | ---------------- |
+| Administrador | `admin@dondo.test`      | `Admin12345`     |
+| Publicador    | `publicador@dondo.test` | `Publisher12345` |
+| Lector        | `lector@dondo.test`     | `Reader12345`    |
