@@ -3,37 +3,62 @@
     <h1>Usuarios</h1>
   </div>
 
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Correo</th>
-          <th>Rol</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (user of users; track user.id) {
+  @if (loading()) {
+    <app-data-state kind="loading" message="Cargando usuarios…" />
+  } @else if (error(); as err) {
+    <app-data-state
+      kind="error"
+      [message]="err.message"
+      [retryable]="!err.isForbidden"
+      (retry)="reload()"
+    />
+  } @else if (users().length === 0) {
+    <app-data-state kind="empty" message="Aún no hay usuarios registrados." />
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
           <tr>
-            <td>{{ user.name }}</td>
-            <td>{{ user.email }}</td>
-            <td>
-              <span class="badge">{{ user.role }}</span>
-            </td>
-            <td class="row">
-              @if (user.role !== 'Administrador') {
-                <button type="button" class="btn" (click)="changeRole(user)">
-                  {{ user.role === 'Publicador' ? 'Degradar' : 'Promover' }}
-                </button>
-                <button type="button" class="btn btn-danger" (click)="suspend(user)">
-                  Suspender
-                </button>
-              }
-            </td>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="badge">{{ roleLabel(user.role) }}</span>
+              </td>
+              <td>{{ user.status === 'active' ? 'Activa' : 'Suspendida' }}</td>
+              <td class="row">
+                @if (user.role !== 'admin') {
+                  <button
+                    type="button"
+                    class="btn"
+                    [disabled]="busyId() === user.id"
+                    (click)="changeRole(user)"
+                  >
+                    {{ user.role === 'publisher' ? 'Degradar' : 'Promover' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    [disabled]="busyId() === user.id"
+                    (click)="toggleSuspension(user)"
+                  >
+                    {{ user.status === 'active' ? 'Suspender' : 'Reactivar' }}
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </section>
