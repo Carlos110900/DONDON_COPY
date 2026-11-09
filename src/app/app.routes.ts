@@ -7,16 +7,19 @@ import { Favorites } from './pages/comics/favorites/favorites';
 import { Home } from './pages/comics/home/home';
 import { Reader } from './pages/comics/reader/reader';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { Forbidden } from './pages/forbidden/forbidden/forbidden';
 import { Landing } from './pages/landing/landing';
 import { Login } from './pages/login/login';
+import { NotFound } from './pages/not-found/not-found';
 import { Register } from './pages/register/register';
+import { guestGuard } from './shared/guards/guest-guard';
 import { pendingChangesGuard } from './shared/guards/pending-changes-guard';
 import { permissionGuard } from './shared/guards/permission-guard';
 
 export const routes: Routes = [
   { path: '', component: Landing, title: 'DonDoDontonbori' },
-  { path: 'login', component: Login, title: 'Iniciar sesión' },
-  { path: 'registro', component: Register, title: 'Crear cuenta' },
+  { path: 'login', component: Login, title: 'Iniciar sesión', canActivate: [guestGuard] },
+  { path: 'registro', component: Register, title: 'Crear cuenta', canActivate: [guestGuard] },
   { path: 'catalogo', component: Home, title: 'Cómics' },
   { path: 'comics/:id', component: Detail, title: 'Detalle del cómic' },
   { path: 'comics/:id/leer/:chapter', component: Reader, title: 'Lector' },
@@ -56,19 +59,8 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: 'comics', component: ComicList, title: 'Mis cómics' },
-  {
-    path: 'comics/nuevo',
-    component: ComicForm,
-    title: 'Nuevo cómic',
-    canDeactivate: [pendingChangesGuard],
-  },
-  {
-    path: 'comics/:id/editar',
-    component: ComicForm,
-    title: 'Editar cómic',
-    canDeactivate: [pendingChangesGuard],
-  },
 
-  { path: '**', redirectTo: '' },
+  { path: 'acceso-denegado', component: Forbidden, title: 'Acceso denegado' },
+  { path: '**', component: NotFound, title: 'No encontrado' },
+  // { path: '**', redirectTo: '' }
 ];
