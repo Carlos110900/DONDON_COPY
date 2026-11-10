@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ApiError } from '../../../shared/api/api-error';
 import { DataState } from '../../../shared/components/data-state/data-state';
 import { Pagination } from '../../../shared/components/pagination/pagination';
+import { HasRole } from '../../../shared/directives/has-role/has-role';
 import { Comic } from '../../../shared/models/comic';
 import { ComicStore } from '../../../shared/services/comic-store';
 import { Confirm } from '../../../shared/services/confirm/confirm';
@@ -12,7 +13,7 @@ import { paginate } from '../../../shared/utils/paginate';
 
 @Component({
   selector: 'app-comic-list',
-  imports: [DataState, Pagination, RouterLink],
+  imports: [DataState, HasRole, Pagination, RouterLink],
   templateUrl: './comic-list.html',
   styleUrl: './comic-list.scss',
 })
