@@ -13,6 +13,7 @@
       <span class="cover-status" role="status">No se pudo cargar la portada.</span>
     }
     <img
+      #cover
       class="cover"
       [class.is-loaded]="coverState() === 'loaded'"
       [src]="comic().cover"

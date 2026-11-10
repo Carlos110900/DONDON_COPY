@@ -45,7 +45,7 @@
       <a routerLink="/panel" routerLinkActive="active">Panel</a>
     </li>
     @if (session.isLoggedIn()) {
-      <li class="user" [attr.title]="session.user()?.email">{{ session.userName() }}</li>
+      <!-- <li class="user" [attr.title]="session.user()?.email">{{ session.userName() }}</li> -->
       <li><button type="button" class="btn" (click)="logout()">Salir</button></li>
     } @else {
       <li><a class="btn btn-primary" routerLink="/login">Iniciar sesión</a></li>
