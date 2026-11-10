@@ -10,7 +10,6 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Forbidden } from './pages/forbidden/forbidden/forbidden';
 import { Landing } from './pages/landing/landing';
 import { Login } from './pages/login/login';
-import { NotFound } from './pages/not-found/not-found';
 import { Register } from './pages/register/register';
 import { guestGuard } from './shared/guards/guest-guard';
 import { pendingChangesGuard } from './shared/guards/pending-changes-guard';
@@ -61,6 +60,5 @@ export const routes: Routes = [
   },
 
   { path: 'acceso-denegado', component: Forbidden, title: 'Acceso denegado' },
-  { path: '**', component: NotFound, title: 'No encontrado' },
   // { path: '**', redirectTo: '' }
 ];
