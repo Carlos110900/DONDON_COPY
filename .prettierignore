@@ -1,0 +1,7 @@
+dist
+node_modules
+coverage
+.scannerwork
+build
+eslint-report.json
+package-lock.json

@@ -1,5 +1,8 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# quitar despues para que en el que no se tienen que subir no se suba (por ahorita si)
+# evidencias
+
 # Compiled output
 /dist/
 /tmp/
@@ -59,3 +62,12 @@ __screenshots__/
 Thumbs.db
 
 /.vscode/
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/.scannerwork/
